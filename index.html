@@ -295,7 +295,7 @@ function App() {
 
   /* Actions */
   const addProj = () => {
-    if(!form.storeId.trim()||!form.partner||!form.assignee) return;
+    if(!form.partner||!form.assignee||!form.start) return;
     const ids=form.storeId.split(',').map(s=>s.trim()).filter(Boolean);
     setProjs(v=>[...v,{...form,storeId:ids.join(', '),storeIds:ids,id:Date.now(),status:'nocontact',hist:[],catId:Number(form.catId)}]);
     setModal(false);
@@ -318,14 +318,17 @@ function App() {
   const setStatus = (id, status) => {
     setProjs(v=>v.map(p=>p.id===id?{...p,status}:p));
   };
+  const markDel = hid => h => h.id===hid?{...h,deleted:true,delAt:new Date().toLocaleString('en-US')}:h;
   const delHist = (pid, hid) => {
-    setProjs(v=>v.map(p=>p.id===pid?{...p,hist:(p.hist||[]).filter(h=>h.id!==hid)}:p));
-    setSel(v=>v?{...v,hist:(v.hist||[]).filter(h=>h.id!==hid)}:v);
+    setProjs(v=>v.map(p=>p.id===pid?{...p,hist:(p.hist||[]).map(markDel(hid))}:p));
+    setSel(v=>v?{...v,hist:(v.hist||[]).map(markDel(hid))}:v);
   };
   const delDoneHist = (pid, hid) => {
-    setDone(v=>v.map(p=>p.id===pid?{...p,hist:(p.hist||[]).filter(h=>h.id!==hid)}:p));
-    setSelDone(v=>v?{...v,hist:(v.hist||[]).filter(h=>h.id!==hid)}:v);
+    setDone(v=>v.map(p=>p.id===pid?{...p,hist:(p.hist||[]).map(markDel(hid))}:p));
+    setSelDone(v=>v?{...v,hist:(v.hist||[]).map(markDel(hid))}:v);
   };
+  const delProj = id => { setProjs(v=>v.filter(x=>x.id!==id)); if(sel?.id===id) setSel(null); };
+  const delDoneProj = id => { setDone(v=>v.filter(x=>x.id!==id)); if(selDone?.id===id) setSelDone(null); };
   const exportData = () => {
     const cols=['Assignee','Partner','Category','Store ID','Memo','Start','Resolved','Status','Days'];
     const esc=v=>{const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
@@ -472,7 +475,7 @@ function App() {
                       color:weekOff===0?'#3B82F6':'#64748B',
                       fontSize:13,fontWeight:600,transition:'all .15s'
                     }}>This week</button>
-                    <span style={{fontSize:13,color:'#64748B',minWidth:178,textAlign:'center',fontWeight:500}}>{weekLabel}</span>
+                    <span style={{fontSize:13,color:'#334155',minWidth:178,textAlign:'center',fontWeight:600}}>{weekLabel}</span>
                     <button className="nbtn" onClick={()=>setWeekOff(v=>v+1)}
                       style={{padding:6,borderRadius:7,border:'none',background:'none',display:'flex',color:'#64748B'}}>
                       <IcChevR size={16}/>
@@ -491,10 +494,12 @@ function App() {
                         <span style={{marginLeft:'auto',fontSize:12,color:'#CBD5E1'}}>{filtered.length}</span>
                       </div>
                       {weekDates.map(d=>(
-                        <div key={d.key} style={{width:COL_W,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,borderRight:'1px solid #F1F5F9',background:d.isToday?'#EFF6FF':d.isSat||d.isSun?'#FAFBFC':'transparent'}}>
-                          <span style={{fontSize:12,fontWeight:700,color:d.isSun?'#EF4444':d.isSat?'#3B82F6':'#94A3B8'}}>{d.day}</span>
-                          <span style={{fontSize:15,fontWeight:d.isToday?800:600,color:d.isToday?'#3B82F6':d.isSat?'#93C5FD':d.isSun?'#FCA5A5':'#475569'}}>{d.label}</span>
-                          {d.isToday&&<span style={{width:5,height:5,borderRadius:'50%',background:'#3B82F6'}}/>}
+                        <div key={d.key} style={{width:COL_W,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,borderRight:'1px solid #EEF1F8',background:d.isToday?'rgba(59,130,246,.06)':d.isSat||d.isSun?'#FBFCFE':'transparent'}}>
+                          <span style={{fontSize:11,fontWeight:600,letterSpacing:.6,textTransform:'uppercase',color:d.isSun?'#F87171':d.isSat?'#60A5FA':'#94A3B8'}}>{d.day}</span>
+                          <span style={{fontSize:13,fontWeight:d.isToday?700:600,lineHeight:1,padding:d.isToday?'4px 10px':'4px 2px',borderRadius:999,
+                            background:d.isToday?'#3B82F6':'transparent',
+                            color:d.isToday?'white':(d.isSun?'#EF4444':d.isSat?'#3B82F6':'#334155'),
+                            boxShadow:d.isToday?'0 3px 8px -2px rgba(59,130,246,.55)':'none',transition:'all .15s',whiteSpace:'nowrap'}}>{d.label}</span>
                         </div>
                       ))}
                     </div>
@@ -601,9 +606,15 @@ function App() {
                       </div>
                       <div style={{fontSize:11,color:'#CBD5E1',marginTop:3}}>{liveSel.start} ~ {liveSel.end||'In progress'}</div>
                     </div>
-                    <button onClick={()=>setSel(null)} style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',flexShrink:0}}>
-                      <IcX size={16}/>
-                    </button>
+                    <div style={{display:'flex',alignItems:'center',gap:2,flexShrink:0}}>
+                      <button className="delbtn" onClick={()=>delProj(sel.id)} title="Delete request"
+                        style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex'}}>
+                        <IcTrash size={15}/>
+                      </button>
+                      <button onClick={()=>setSel(null)} title="Close" style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex'}}>
+                        <IcX size={16}/>
+                      </button>
+                    </div>
                   </div>
                   {/* Status chips (single-select) */}
                   <div style={{padding:'11px 14px 4px',display:'flex',flexWrap:'wrap',gap:6,flexShrink:0}}>
@@ -641,19 +652,21 @@ function App() {
                       : liveSel.hist.map(h=>(
                         <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
                           <div style={{fontSize:11,color:'#94A3B8',marginBottom:3}}>{h.by}</div>
-                          <div style={{
-                            maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
-                            background:h.by==='Me'?'#3B82F6':'#F1F5F9',
-                            color:h.by==='Me'?'white':'#334155',
-                            borderBottomRightRadius:h.by==='Me'?3:12,
-                            borderBottomLeftRadius:h.by==='Me'?12:3,
-                          }}>{h.text}</div>
+                          {h.deleted
+                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F8FAFC',color:'#CBD5E1',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                            : <div style={{
+                                maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
+                                background:h.by==='Me'?'#3B82F6':'#F1F5F9',
+                                color:h.by==='Me'?'white':'#334155',
+                                borderBottomRightRadius:h.by==='Me'?3:12,
+                                borderBottomLeftRadius:h.by==='Me'?12:3,
+                              }}>{h.text}</div>}
                           <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
-                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.at}</span>
-                            <button className="delbtn" onClick={()=>delHist(sel.id,h.id)} title="Delete"
+                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
+                            {!h.deleted&&<button className="delbtn" onClick={()=>delHist(sel.id,h.id)} title="Delete"
                               style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',alignItems:'center'}}>
                               <IcTrash size={11}/>
-                            </button>
+                            </button>}
                           </div>
                         </div>
                       ))
@@ -692,7 +705,7 @@ function App() {
                   <span style={{fontSize:14,color:'#94A3B8'}}><b style={{color:'#334155'}}>{dataRows.length}</b> shown</span>
                   {/* Date range + Export (right) */}
                   <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
-                    <div style={{display:'flex',alignItems:'center',gap:6,background:'white',border:'1px solid #E2E8F0',borderRadius:10,padding:'5px 10px',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6,background:'white',border:'1px solid #E2E8F0',borderRadius:10,padding:'8px 12px',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
                       <input type="date" value={resRange.from} onChange={e=>setResRange(v=>({...v,from:e.target.value}))}
                         style={{fontSize:13,border:'none',background:'none',color:'#334155',outline:'none',cursor:'pointer'}}/>
                       <span style={{color:'#CBD5E1',fontSize:13}}>~</span>
@@ -777,12 +790,17 @@ function App() {
                       <IcX size={16}/>
                     </button>
                   </div>
-                  {/* Reopen button */}
-                  <div style={{padding:'10px 16px',borderBottom:'1px solid #F1F5F9',flexShrink:0}}>
+                  {/* Reopen / Delete buttons */}
+                  <div style={{padding:'10px 16px',borderBottom:'1px solid #F1F5F9',flexShrink:0,display:'flex',gap:8}}>
                     <button onClick={()=>revertDone(selDone.id)}
-                      style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'7px 0',borderRadius:8,
+                      style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'7px 0',borderRadius:8,
                         border:'1px solid #F59E0B',background:'#FFFBEB',color:'#D97706',fontSize:12,fontWeight:600,cursor:'pointer'}}>
                       <IcRefresh size={13}/>Reopen
+                    </button>
+                    <button onClick={()=>delDoneProj(selDone.id)}
+                      style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'7px 0',borderRadius:8,
+                        border:'1px solid #FECACA',background:'#FEF2F2',color:'#EF4444',fontSize:12,fontWeight:600,cursor:'pointer'}}>
+                      <IcTrash size={13}/>Delete
                     </button>
                   </div>
                   {/* History list */}
@@ -794,17 +812,19 @@ function App() {
                       :(selDone.hist||[]).map(h=>(
                         <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
                           <div style={{fontSize:11,color:'#94A3B8',marginBottom:3}}>{h.by}</div>
-                          <div style={{maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
-                            background:h.by==='Me'?'#3B82F6':'#F1F5F9',color:h.by==='Me'?'white':'#334155',
-                            borderBottomRightRadius:h.by==='Me'?3:12,borderBottomLeftRadius:h.by==='Me'?12:3}}>
-                            {h.text}
-                          </div>
+                          {h.deleted
+                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F8FAFC',color:'#CBD5E1',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                            : <div style={{maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
+                                background:h.by==='Me'?'#3B82F6':'#F1F5F9',color:h.by==='Me'?'white':'#334155',
+                                borderBottomRightRadius:h.by==='Me'?3:12,borderBottomLeftRadius:h.by==='Me'?12:3}}>
+                                {h.text}
+                              </div>}
                           <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
-                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.at}</span>
-                            <button className="delbtn" onClick={()=>delDoneHist(selDone.id,h.id)} title="Delete"
+                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
+                            {!h.deleted&&<button className="delbtn" onClick={()=>delDoneHist(selDone.id,h.id)} title="Delete"
                               style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',alignItems:'center'}}>
                               <IcTrash size={11}/>
-                            </button>
+                            </button>}
                           </div>
                         </div>
                       ))
@@ -1115,12 +1135,14 @@ function App() {
                                 ?<div style={{display:'flex',alignItems:'center',justifyContent:'center',flex:1,color:'#CBD5E1',fontSize:12}}>No history</div>
                                 :(selDone.hist||[]).map(h=>(
                                   <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
-                                    <div style={{fontSize:10,color:'#94A3B8',marginBottom:3}}>{h.by} · {h.at}</div>
-                                    <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:h.by==='Me'?'12px 4px 12px 12px':'4px 12px 12px 12px',
-                                      background:h.by==='Me'?'#3B82F6':'white',color:h.by==='Me'?'white':'#334155',
-                                      fontSize:12,lineHeight:1.5,boxShadow:'0 1px 3px rgba(0,0,0,.08)',border:h.by==='Me'?'none':'1px solid #E2E8F0'}}>
-                                      {h.text}
-                                    </div>
+                                    <div style={{fontSize:10,color:'#94A3B8',marginBottom:3}}>{h.by} · {h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</div>
+                                    {h.deleted
+                                      ? <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:10,background:'#F8FAFC',color:'#CBD5E1',fontSize:12,fontStyle:'italic',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                                      : <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:h.by==='Me'?'12px 4px 12px 12px':'4px 12px 12px 12px',
+                                          background:h.by==='Me'?'#3B82F6':'white',color:h.by==='Me'?'white':'#334155',
+                                          fontSize:12,lineHeight:1.5,boxShadow:'0 1px 3px rgba(0,0,0,.08)',border:h.by==='Me'?'none':'1px solid #E2E8F0'}}>
+                                          {h.text}
+                                        </div>}
                                   </div>
                                 ))
                               }
@@ -1193,10 +1215,10 @@ function App() {
 
               {/* Store ID */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Store ID <span style={{color:'#EF4444'}}>*</span> <span style={{color:'#94A3B8',fontWeight:400}}>(separate multiple with commas)</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Store ID <span style={{color:'#94A3B8',fontWeight:400}}>(optional · separate multiple with commas)</span></label>
                 <textarea value={form.storeId} onChange={e=>setForm(v=>({...v,storeId:e.target.value}))}
                   placeholder="e.g. 44556, 3421, 33456, 11235" rows={2}
-                  style={{width:'100%',border:`1px solid ${!form.storeId.trim()?'#FCA5A5':'#E2E8F0'}`,borderRadius:10,padding:'11px 13px',fontSize:14,resize:'vertical',fontFamily:'inherit'}}/>
+                  style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 13px',fontSize:14,resize:'vertical',fontFamily:'inherit'}}/>
                 {(()=>{const n=form.storeId.split(',').map(s=>s.trim()).filter(Boolean).length;return n>1?<div style={{marginTop:6,fontSize:11,color:'#3B82F6',fontWeight:600}}>{n} stores entered · registered as 1 project</div>:null;})()}
               </div>
 
@@ -1211,7 +1233,7 @@ function App() {
             </div>
             <div style={{padding:'0 24px 24px',display:'flex',gap:12,flexShrink:0}}>
               <button onClick={()=>setModal(false)} style={{flex:1,padding:'13px 0',border:'1px solid #E2E8F0',borderRadius:12,fontSize:14,fontWeight:600,color:'#64748B',background:'white',cursor:'pointer'}}>Cancel</button>
-              {(()=>{const ok=form.storeId.trim()&&form.partner&&form.assignee&&form.start;return(
+              {(()=>{const ok=form.partner&&form.assignee&&form.start;return(
                 <button onClick={addProj} disabled={!ok} style={{
                   flex:1,padding:'13px 0',border:'none',borderRadius:12,fontSize:14,fontWeight:700,color:'white',
                   cursor:ok?'pointer':'not-allowed',
