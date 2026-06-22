@@ -1,0 +1,6 @@
+# Local tooling / preview config
+.claude/
+
+# Backup snapshots
+index.backup.html
+*.backup.html
