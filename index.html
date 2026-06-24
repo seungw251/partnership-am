@@ -67,6 +67,7 @@ const IcTrend   = p => <Ic {...p}><line x1="18" y1="20" x2="18" y2="10"/><line x
 const IcUsers   = p => <Ic {...p}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Ic>;
 const IcList    = p => <Ic {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></Ic>;
 const IcRefresh = p => <Ic {...p}><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></Ic>;
+const IcFilter  = p => <Ic {...p}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></Ic>;
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 const today   = new Date();
@@ -191,6 +192,12 @@ function App() {
   const [resScope, setResScope] = useState('total');
   const [resRange, setResRange] = useState({from:'',to:''});
   const [colW, setColW] = useState([130,150,200,150,320,120,160,80]);
+  const [colFilters, setColFilters] = useState({});      // {colKey:[selected values]}
+  const [sortState, setSortState]   = useState({key:null,dir:'asc'});
+  const [openCol, setOpenCol]       = useState(null);    // column key whose filter popup is open
+  const [openPos, setOpenPos]       = useState({x:0,y:0});
+  const [draftSel, setDraftSel]     = useState([]);
+  const [fSearch, setFSearch]       = useState('');
   const [completeDate,setCompleteDate]= useState(fmt(today));
   const doneHistRef = useRef(null);
   const initForm = () => ({storeId:'',partner:partners[0]?.name||'',assignee:assignees[0]?.name||'',catId:cats[0]?.id??1,start:fmt(today),end:'',memo:''});
@@ -262,9 +269,23 @@ function App() {
     done:done.filter(p=>p.catId===c.id).length,
   })),[cats,projs,done]);
 
-  /* Data 화면: 범위/스코프/컬럼필터로 거른 행 목록 (테이블 + 엑셀추출 공용) */
-  const dataRows = useMemo(()=>{
-    const norm=s=>String(s||'').toLowerCase();
+  /* Data 화면 컬럼 정의 + 셀 값 추출 (필터/정렬 공용) */
+  const COLKEYS=['assignee','partner','category','storeId','memo','start','resolved','days'];
+  const colVal=(key,p)=>{
+    switch(key){
+      case 'assignee':return p.assignee||'';
+      case 'partner': return p.partner||'';
+      case 'category':{const c=cats.find(x=>x.id===p.catId);return c?c.name:'';}
+      case 'storeId': return p.storeId||'';
+      case 'memo':    return p.memo||'';
+      case 'start':   return p.start||'';
+      case 'resolved':return p._resolved?(p.doneAt||''):(ST[p.status]?ST[p.status].label:'');
+      case 'days':    return (p._days!==''&&p._days!=null)?String(p._days):'';
+      default:return '';
+    }
+  };
+  /* 스코프+기간으로 거른 기본 풀 (컬럼필터/정렬 적용 전) — 필터 옵션 목록의 기준 */
+  const dataPool = useMemo(()=>{
     const anyRange=resRange.from||resRange.to;
     const inRange=d=>{ if(!d)return false; if(resRange.from&&d<resRange.from)return false; if(resRange.to&&d>resRange.to)return false; return true; };
     const daysOf=p=>p._resolved
@@ -273,18 +294,33 @@ function App() {
     let pool=[];
     if(resScope==='total'||resScope==='ongoing') pool=pool.concat(projs.filter(p=>!anyRange||inRange(p.start)).map(p=>({...p,_resolved:false})));
     if(resScope==='total'||resScope==='resolved') pool=pool.concat(done.filter(p=>!anyRange||inRange(p.doneAt)).map(p=>({...p,_resolved:true})));
-    return pool.filter(p=>{
-      if(resF.assignee&&p.assignee!==resF.assignee)return false;
-      if(resF.partner&&p.partner!==resF.partner)return false;
-      if(resF.catId&&String(p.catId)!==String(resF.catId))return false;
-      if(resF.storeId&&!norm(p.storeId).includes(norm(resF.storeId)))return false;
-      if(resF.memo&&!norm(p.memo).includes(norm(resF.memo)))return false;
-      if(resF.start&&!norm(p.start).includes(norm(resF.start)))return false;
-      if(resF.resolved&&!norm(p.doneAt).includes(norm(resF.resolved)))return false;
-      if(resF.days&&!String(daysOf(p)).includes(resF.days.trim()))return false;
-      return true;
-    }).map(p=>({...p,_days:daysOf(p)}));
-  },[projs,done,resScope,resRange,resF]);
+    return pool.map(p=>({...p,_days:daysOf(p)}));
+  },[projs,done,resScope,resRange]);
+  /* 컬럼 멀티필터 + 정렬 적용 (테이블 + 엑셀추출 공용) */
+  const dataRows = useMemo(()=>{
+    let rows=dataPool;
+    Object.keys(colFilters).forEach(k=>{const sel=colFilters[k];if(sel)rows=rows.filter(p=>sel.indexOf(colVal(k,p))>=0);});
+    if(sortState.key){
+      const k=sortState.key, dir=sortState.dir==='desc'?-1:1, numeric=k==='days';
+      rows=[...rows].sort((a,b)=>{const x=colVal(k,a),y=colVal(k,b);
+        if(numeric)return ((parseFloat(x)||0)-(parseFloat(y)||0))*dir;
+        return (x<y?-1:x>y?1:0)*dir;});
+    }
+    return rows;
+  },[dataPool,colFilters,sortState,cats]);
+  const distinctVals = key => { const s=new Set(); dataPool.forEach(p=>s.add(colVal(key,p))); return [...s].sort((a,b)=>a<b?-1:a>b?1:0); };
+  const openFilterMenu = (key,e) => {
+    const r=e.currentTarget.getBoundingClientRect();
+    setOpenPos({x:Math.max(8,Math.min(r.left,window.innerWidth-262)),y:r.bottom+6});
+    setDraftSel(colFilters[key]?[...colFilters[key]]:distinctVals(key));
+    setFSearch(''); setOpenCol(key);
+  };
+  const applyFilter = () => {
+    const all=distinctVals(openCol);
+    setColFilters(f=>{const nf={...f}; if(draftSel.length>=all.length){delete nf[openCol];}else{nf[openCol]=draftSel;} return nf;});
+    setOpenCol(null);
+  };
+  const clearAllFilters = () => { setColFilters({}); setSortState({key:null,dir:'asc'}); };
 
   const catBy   = id => cats.find(c=>c.id===id);
   const liveSel = sel ? projs.find(p=>p.id===sel.id) : null;
@@ -604,7 +640,6 @@ function App() {
                           {ST[liveSel.status].label}
                         </span>
                       </div>
-                      <div style={{fontSize:11,color:'#CBD5E1',marginTop:3}}>{liveSel.start} ~ {liveSel.end||'In progress'}</div>
                     </div>
                     <div style={{display:'flex',alignItems:'center',gap:2,flexShrink:0}}>
                       <button className="delbtn" onClick={()=>delProj(sel.id)} title="Delete request"
@@ -703,6 +738,10 @@ function App() {
                   </div>
                   {/* Count */}
                   <span style={{fontSize:14,color:'#94A3B8'}}><b style={{color:'#334155'}}>{dataRows.length}</b> shown</span>
+                  {(Object.keys(colFilters).length>0||sortState.key)&&(
+                    <button onClick={clearAllFilters}
+                      style={{padding:'7px 12px',borderRadius:8,border:'1px solid #FECACA',background:'#FEF2F2',color:'#EF4444',fontSize:12,fontWeight:600,cursor:'pointer'}}>Clear filters</button>
+                  )}
                   {/* Date range + Export (right) */}
                   <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
                     <div style={{display:'flex',alignItems:'center',gap:6,background:'white',border:'1px solid #E2E8F0',borderRadius:10,padding:'8px 12px',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
@@ -732,15 +771,20 @@ function App() {
                       <div style={{minWidth:SHEET_W}}>
                         {/* Header (sticky top) + drag-to-resize handles */}
                         <div style={{position:'sticky',top:0,zIndex:2,background:'#F8FAFC',borderBottom:'2px solid #E2E8F0',display:'grid',gridTemplateColumns:GCOLS,padding:'13px 16px'}}>
-                          {HEADERS.map((h,i)=>(
-                            <div key={h} style={{position:'relative',display:'flex',alignItems:'center',minWidth:0,paddingRight:12}}>
+                          {HEADERS.map((h,i)=>{const ck=COLKEYS[i];const filtered=!!colFilters[ck];const sorted=sortState.key===ck;return (
+                            <div key={h} style={{position:'relative',display:'flex',alignItems:'center',gap:3,minWidth:0,paddingRight:12}}>
                               <span style={{fontSize:12,fontWeight:700,color:'#64748B',letterSpacing:.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h}</span>
+                              {sorted&&<span style={{fontSize:9,color:'#3B82F6',flexShrink:0}}>{sortState.dir==='desc'?'▼':'▲'}</span>}
+                              <button className="nbtn" onClick={e=>openFilterMenu(ck,e)} title="Filter"
+                                style={{padding:3,borderRadius:6,border:'1px solid '+(filtered?'#BFDBFE':'#E2E8F0'),background:filtered?'#EFF6FF':'white',cursor:'pointer',color:filtered?'#3B82F6':'#64748B',display:'flex',flexShrink:0}}>
+                                <IcFilter size={13}/>
+                              </button>
                               <div className="colresize" onMouseDown={e=>startResize(i,e)} title="Drag to resize"
                                 style={{position:'absolute',top:-13,right:-3,width:12,height:'calc(100% + 26px)',cursor:'col-resize',display:'flex',justifyContent:'center',zIndex:4}}>
                                 <div style={{width:2,height:'100%',background:'transparent',borderRadius:2}}/>
                               </div>
                             </div>
-                          ))}
+                          );})}
                         </div>
                         {!dataRows.length
                           ? <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 0',color:'#94A3B8',gap:8}}><IcArchive size={28}/><span style={{fontSize:13}}>No projects</span></div>
@@ -784,7 +828,6 @@ function App() {
                         <span style={{fontSize:11,color:'#94A3B8'}}>{selDone.assignee}</span>
                         {(()=>{const c=catBy(selDone.catId);return c?<span style={{fontSize:10,padding:'2px 7px',borderRadius:999,color:'white',background:c.color}}>{c.name}</span>:null;})()}
                       </div>
-                      <div style={{fontSize:11,color:'#CBD5E1',marginTop:3}}>{selDone.start} ~ {selDone.doneAt}</div>
                     </div>
                     <button onClick={()=>setSelDone(null)} style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',flexShrink:0}}>
                       <IcX size={16}/>
@@ -842,6 +885,45 @@ function App() {
                   </div>
                 </div>
               )}
+
+              {/* Column filter popup (multi-select + sort) */}
+              {openCol&&(()=>{
+                const LBL={assignee:'Assignee',partner:'Partner',category:'Category',storeId:'Store ID',memo:'Memo',start:'Start',resolved:'Resolved',days:'Days'};
+                const all=distinctVals(openCol);
+                const shown=all.filter(o=>String(o).toLowerCase().includes(fSearch.toLowerCase()));
+                const mi={width:'100%',textAlign:'left',padding:'8px 10px',border:'none',background:'none',cursor:'pointer',fontSize:13,color:'#334155',borderRadius:7,display:'flex',alignItems:'center',gap:8};
+                return (
+                  <>
+                    <div onClick={()=>setOpenCol(null)} style={{position:'fixed',inset:0,zIndex:60}}/>
+                    <div style={{position:'fixed',left:openPos.x,top:openPos.y,zIndex:61,width:250,background:'white',borderRadius:12,border:'1px solid #EAEDF4',boxShadow:'0 16px 40px -8px rgba(16,24,40,.28)',padding:8,fontSize:13}}>
+                      <div style={{fontSize:11,fontWeight:700,color:'#94A3B8',letterSpacing:.4,textTransform:'uppercase',padding:'2px 10px 6px'}}>{LBL[openCol]}</div>
+                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'asc'});setOpenCol(null);}} style={mi}><span style={{color:'#94A3B8'}}>▲</span>Sort ascending</button>
+                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'desc'});setOpenCol(null);}} style={mi}><span style={{color:'#94A3B8'}}>▼</span>Sort descending</button>
+                      <div style={{height:1,background:'#F1F5F9',margin:'6px 4px'}}/>
+                      <input value={fSearch} onChange={e=>setFSearch(e.target.value)} placeholder="Search"
+                        style={{width:'calc(100% - 8px)',margin:'2px 4px 8px',fontSize:12,border:'1px solid #E2E8F0',borderRadius:8,padding:'7px 9px',outline:'none'}}/>
+                      <div style={{display:'flex',alignItems:'center',gap:8,padding:'0 8px 6px',fontSize:11}}>
+                        <button onClick={()=>setDraftSel([...all])} style={{border:'none',background:'none',color:'#3B82F6',fontWeight:600,cursor:'pointer',padding:0}}>Select all</button>
+                        <span style={{color:'#CBD5E1'}}>·</span>
+                        <button onClick={()=>setDraftSel([])} style={{border:'none',background:'none',color:'#3B82F6',fontWeight:600,cursor:'pointer',padding:0}}>Clear</button>
+                        <span style={{marginLeft:'auto',color:'#94A3B8'}}>{draftSel.length}/{all.length}</span>
+                      </div>
+                      <div style={{maxHeight:208,overflowY:'auto',padding:'0 2px'}}>
+                        {shown.length?shown.map(o=>{const on=draftSel.indexOf(o)>=0;return (
+                          <label key={o} className="nbtn" style={{display:'flex',alignItems:'center',gap:9,padding:'7px 8px',borderRadius:7,cursor:'pointer'}}>
+                            <input type="checkbox" checked={on} onChange={()=>setDraftSel(s=>on?s.filter(x=>x!==o):[...s,o])} style={{accentColor:'#3B82F6',cursor:'pointer',width:14,height:14}}/>
+                            <span style={{fontSize:13,color:o===''?'#94A3B8':'#334155',fontStyle:o===''?'italic':'normal',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{o===''?'(blank)':o}</span>
+                          </label>
+                        );}):<div style={{padding:'12px 10px',color:'#CBD5E1',fontSize:12}}>No matches</div>}
+                      </div>
+                      <div style={{display:'flex',gap:8,padding:'10px 4px 2px'}}>
+                        <button onClick={()=>setOpenCol(null)} style={{flex:1,padding:'8px 0',borderRadius:8,border:'1px solid #E2E8F0',background:'white',color:'#64748B',fontSize:13,fontWeight:600,cursor:'pointer'}}>Cancel</button>
+                        <button onClick={applyFilter} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',background:'#3B82F6',color:'white',fontSize:13,fontWeight:600,cursor:'pointer'}}>Apply</button>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
           ) : view==='perf' ? (
