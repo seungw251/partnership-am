@@ -12,33 +12,40 @@
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.4/babel.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#EEF1F8;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-0.011em;font-feature-settings:'cv02','cv03','cv04','tnum';color:#1E293B}
-    input,select,textarea,button{font-family:inherit}
-    ::-webkit-scrollbar{width:8px;height:8px}
+    body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Inter','Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#F2F2F7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-0.022em;font-feature-settings:'cv02','cv03','cv04','tnum';color:#1C1C1E}
+    input,select,textarea,button{font-family:inherit;letter-spacing:inherit}
+    ::-webkit-scrollbar{width:7px;height:7px}
     ::-webkit-scrollbar-track{background:transparent}
-    ::-webkit-scrollbar-thumb{background:#C7CEDC;border-radius:4px;border:2px solid transparent;background-clip:padding-box}
-    ::-webkit-scrollbar-thumb:hover{background:#A8B2C6;background-clip:padding-box}
-    #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#EEF1F8;z-index:9999}
-    .spin{width:34px;height:34px;border:3px solid #DCE2EE;border-top-color:#3B82F6;border-radius:50%;animation:sp .7s linear infinite}
+    ::-webkit-scrollbar-thumb{background:rgba(60,60,67,.28);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(60,60,67,.45);background-clip:padding-box}
+    #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#F2F2F7;z-index:9999}
+    .spin{width:32px;height:32px;border:3px solid rgba(0,122,255,.18);border-top-color:#007AFF;border-radius:50%;animation:sp .7s linear infinite}
     @keyframes sp{to{transform:rotate(360deg)}}
-    .row-item{transition:background .14s}
-    .row-item:hover{background:rgba(59,130,246,.05)!important}
-    .bar{transition:filter .14s,box-shadow .18s,transform .14s;cursor:pointer}
-    .bar:hover{filter:brightness(1.04) saturate(1.05);transform:translateY(-1px)}
-    .nbtn{transition:background .14s;cursor:pointer}
-    .nbtn:hover{background:#EEF1F8!important}
-    .delbtn{transition:color .12s;opacity:.65}
-    .delbtn:hover{color:#EF4444!important;opacity:1}
-    .selbtn{transition:border-color .14s,box-shadow .14s,background-color .14s}
-    .selbtn:hover{border-color:#CBD5E1!important;box-shadow:0 2px 8px -2px rgba(16,24,40,.12)!important;background-color:#FCFDFF!important}
+    .row-item{transition:background .18s}
+    .row-item:hover{background:rgba(0,122,255,.06)!important}
+    .bar{transition:filter .18s,box-shadow .22s,transform .18s;cursor:pointer}
+    .bar:hover{filter:brightness(1.05) saturate(1.04);transform:translateY(-1px)}
+    .nbtn{transition:background .18s,color .18s;cursor:pointer}
+    .nbtn:hover{background:rgba(120,120,128,.12)!important}
+    .navbtn{transition:background .18s,color .18s,transform .12s}
+    .navbtn:active{transform:scale(.97)}
+    .pbtn{transition:filter .18s,transform .12s,box-shadow .18s}
+    .pbtn:hover{filter:brightness(1.05)}
+    .pbtn:active{transform:scale(.97)}
+    .delbtn{transition:color .14s;opacity:.6}
+    .delbtn:hover{color:#FF3B30!important;opacity:1}
+    .selbtn{transition:border-color .18s,box-shadow .18s,background-color .18s}
+    .selbtn:hover{border-color:rgba(0,122,255,.5)!important;box-shadow:0 2px 8px -2px rgba(0,0,0,.1)!important;background-color:#fff!important}
     .colresize>div{transition:background .1s}
-    .colresize:hover>div{background:#93C5FD}
-    .colresize:active>div{background:#3B82F6}
-    input:focus,select:focus{outline:2px solid #3B82F6;outline-offset:-1px}
+    .colresize:hover>div{background:rgba(0,122,255,.55)}
+    .colresize:active>div{background:#007AFF}
+    input:focus,select:focus,textarea:focus{outline:2px solid #007AFF;outline-offset:-1px}
+    @keyframes sheetIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   </style>
 </head>
 <body>
-  <div id="loading"><div class="spin"></div><span style="color:#94A3B8;font-size:13px">Loading...</span></div>
+  <div id="loading"><div class="spin"></div><span style="color:#8E8E93;font-size:13px">Loading...</span></div>
   <div id="root"></div>
 <script type="text/babel">
 const { useState, useMemo, useRef, useEffect } = React;
@@ -105,22 +112,22 @@ const INIT_ASSIGNEES = [
 const LABEL_W = 240, COL_W = 118, ROW_H = 42, HEADER_H = 60, GRP_H = 38;
 
 const INIT_CATS = [
-  {id:1, name:'Create Test Store',          color:'#3B82F6'},
-  {id:2, name:'Generate Store ID',          color:'#8B5CF6'},
-  {id:3, name:'Store Copy',                 color:'#F59E0B'},
-  {id:4, name:'Store Info Update',          color:'#10B981'},
-  {id:5, name:'Store Termination',          color:'#EF4444'},
-  {id:6, name:'Checking Live Status',       color:'#06B6D4'},
-  {id:7, name:'Settlement Report Issuance', color:'#6366F1'},
-  {id:8, name:'Bank Account Update',        color:'#F97316'},
-  {id:9, name:'ID/PW Update',               color:'#14B8A6'},
-  {id:10,name:'Tablet / Camel',             color:'#A855F7'},
-  {id:11,name:'Delete Store',               color:'#E11D48'},
-  {id:12,name:'Update Business License',    color:'#0EA5E9'},
-  {id:13,name:'SPAIS',                      color:'#EC4899'},
-  {id:14,name:'Ad',                         color:'#84CC16'},
-  {id:15,name:'Create Slack Channel',       color:'#D946EF'},
-  {id:16,name:'Others',                     color:'#64748B'},
+  {id:1, name:'Create Test Store',          color:'#007AFF'},
+  {id:2, name:'Generate Store ID',          color:'#AF52DE'},
+  {id:3, name:'Store Copy',                 color:'#FF9500'},
+  {id:4, name:'Store Info Update',          color:'#34C759'},
+  {id:5, name:'Store Termination',          color:'#FF3B30'},
+  {id:6, name:'Checking Live Status',       color:'#32ADE6'},
+  {id:7, name:'Settlement Report Issuance', color:'#5856D6'},
+  {id:8, name:'Bank Account Update',        color:'#FF9500'},
+  {id:9, name:'ID/PW Update',               color:'#30B0C7'},
+  {id:10,name:'Tablet / Camel',             color:'#BF5AF2'},
+  {id:11,name:'Delete Store',               color:'#FF2D55'},
+  {id:12,name:'Update Business License',    color:'#0A84FF'},
+  {id:13,name:'SPAIS',                      color:'#FF375F'},
+  {id:14,name:'Ad',                         color:'#30D158'},
+  {id:15,name:'Create Slack Channel',       color:'#DA3CCB'},
+  {id:16,name:'Others',                     color:'#8E8E93'},
 ];
 
 const INIT_PROJ = [
@@ -152,10 +159,10 @@ const INIT_DONE = [
 ];
 
 const ST = {
-  awaiting: {label:'Awaiting response',color:'#F59E0B',bg:'#FEF3C7',dark:'#D97706',text:'#78350F'},
-  review:   {label:'Internal review',  color:'#3B82F6',bg:'#DBEAFE',dark:'#2563EB',text:'#1E3A8A'},
-  absent:   {label:'Absent',           color:'#EF4444',bg:'#FEE2E2',dark:'#DC2626',text:'#7F1D1D'},
-  nocontact:{label:'No contact yet',   color:'#94A3B8',bg:'#F1F5F9',dark:'#64748B',text:'#334155'},
+  awaiting: {label:'Awaiting response',color:'#FF9500',bg:'#FFF4E5',dark:'#E07C00',text:'#995700'},
+  review:   {label:'Internal review',  color:'#007AFF',bg:'#E5F1FF',dark:'#0062D6',text:'#004999'},
+  absent:   {label:'Absent',           color:'#FF3B30',bg:'#FFE9E7',dark:'#D70015',text:'#8A0E08'},
+  nocontact:{label:'No contact yet',   color:'#8E8E93',bg:'#EFEFF4',dark:'#636366',text:'#48484A'},
 };
 // Ongoing sub-status order
 const ONGOING_STATUSES = ['awaiting','review','absent','nocontact'];
@@ -409,7 +416,7 @@ function App() {
   };
   const addCat = () => {
     if(!nCat.trim()) return;
-    const pal=['#3B82F6','#8B5CF6','#F59E0B','#10B981','#EF4444','#EC4899'];
+    const pal=['#007AFF','#AF52DE','#FF9500','#34C759','#FF3B30','#FF2D55'];
     setCats(v=>[...v,{id:Date.now(),name:nCat,color:pal[v.length%pal.length]}]);
     setNCat('');
   };
@@ -422,53 +429,52 @@ function App() {
   const updAsgn = (id,n) => {if(!n.trim())return;setAssignees(v=>v.map(a=>a.id===id?{...a,name:n}:a));setEAsgn(null);};
   const delAsgn = id => setAssignees(v=>v.filter(a=>a.id!==id));
 
-  const card = {background:'white',borderRadius:16,border:'1px solid #EAEDF4',boxShadow:'0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.12)'};
+  const card = {background:'rgba(255,255,255,.92)',borderRadius:20,border:'1px solid rgba(0,0,0,.05)',boxShadow:'0 1px 1px rgba(0,0,0,.03),0 10px 30px -16px rgba(0,0,0,.18)'};
 
   return (
-    <div style={{display:'flex',height:'100vh',background:'#EEF1F8',overflow:'hidden'}}>
+    <div style={{display:'flex',height:'100vh',background:'#F2F2F7',overflow:'hidden'}}>
 
-      {/* ── Sidebar ───────────────────────────────────────────────── */}
-      <aside style={{width:col?64:224,background:'linear-gradient(180deg,#111A2E 0%,#0C1322 100%)',display:'flex',flexDirection:'column',flexShrink:0,transition:'width .2s',zIndex:10,boxShadow:'4px 0 24px -12px rgba(16,24,40,.45)'}}>
-        <div style={{height:56,display:'flex',alignItems:'center',justifyContent:col?'center':'space-between',padding:'0 14px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
-          {!col&&<span style={{fontWeight:800,fontSize:15,letterSpacing:1.5,color:'#60A5FA'}}>Partnership AM</span>}
+      {/* ── Sidebar (iOS frosted glass) ───────────────────────────── */}
+      <aside style={{width:col?68:228,background:'rgba(248,248,250,.78)',backdropFilter:'saturate(180%) blur(22px)',WebkitBackdropFilter:'saturate(180%) blur(22px)',borderRight:'1px solid rgba(0,0,0,.07)',display:'flex',flexDirection:'column',flexShrink:0,transition:'width .25s cubic-bezier(.4,0,.2,1)',zIndex:10}}>
+        <div style={{height:56,display:'flex',alignItems:'center',justifyContent:col?'center':'space-between',padding:'0 16px'}}>
+          {!col&&<span style={{fontWeight:700,fontSize:16,letterSpacing:-.4,color:'#1C1C1E'}}>Partnership AM</span>}
           <button className="nbtn" onClick={()=>setCol(v=>!v)}
-            style={{padding:6,borderRadius:8,background:'transparent',border:'none',color:'#64748B',display:'flex'}}>
+            style={{padding:7,borderRadius:9,background:'transparent',border:'none',color:'#8E8E93',display:'flex'}}>
             {col?<IcChevR size={16}/>:<IcChevL size={16}/>}
           </button>
         </div>
-        <nav style={{flex:1,padding:'10px 0'}}>
+        <nav style={{flex:1,padding:col?'8px 10px':'8px 12px',display:'flex',flexDirection:'column',gap:3}}>
           {[{id:'perf',Icon:IcTrend,label:'Dashboard'},{id:'dash',Icon:IcDash,label:'Request'},{id:'donelist',Icon:IcArchive,label:'Data'},{id:'admin',Icon:IcGear,label:'Setting'}].map(({id,Icon,label})=>(
-            <button key={id} onClick={()=>setView(id)} style={{
-              width:'100%',display:'flex',alignItems:'center',gap:13,
-              padding:col?'13px 0':'12px 16px',justifyContent:col?'center':'flex-start',
-              background:view===id?'rgba(59,130,246,.15)':'transparent',
-              borderLeft:`3px solid ${view===id?'#3B82F6':'transparent'}`,
-              border:'none',color:view===id?'#93C5FD':'#7C8AA5',
-              cursor:'pointer',fontSize:14,fontWeight:view===id?600:500,transition:'all .15s'
+            <button key={id} className="navbtn" onClick={()=>setView(id)} style={{
+              width:'100%',display:'flex',alignItems:'center',gap:11,
+              padding:col?'11px 0':'10px 12px',justifyContent:col?'center':'flex-start',borderRadius:12,
+              background:view===id?'#007AFF':'transparent',
+              border:'none',color:view===id?'#fff':'#3C3C43',
+              cursor:'pointer',fontSize:14.5,fontWeight:view===id?600:500,
+              boxShadow:view===id?'0 4px 12px -3px rgba(0,122,255,.5)':'none'
             }}><Icon size={18}/>{!col&&<span>{label}</span>}</button>
           ))}
         </nav>
         {!col&&(
-          <div style={{padding:14,borderTop:'1px solid rgba(255,255,255,.08)',display:'flex',alignItems:'center',gap:10}}>
-            <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#3B82F6,#8B5CF6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:'white',flexShrink:0}}>A</div>
-            <div><div style={{fontSize:12,fontWeight:600,color:'white'}}>Admin</div><div style={{fontSize:11,color:'#475569'}}>Administrator</div></div>
+          <div style={{margin:12,padding:'10px 12px',borderRadius:14,background:'rgba(120,120,128,.1)',display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:34,height:34,borderRadius:'50%',background:'linear-gradient(135deg,#007AFF,#AF52DE)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,color:'white',flexShrink:0}}>A</div>
+            <div><div style={{fontSize:13,fontWeight:600,color:'#1C1C1E'}}>Admin</div><div style={{fontSize:11.5,color:'#8E8E93'}}>Administrator</div></div>
           </div>
         )}
       </aside>
 
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}}>
         {/* ── Header ───────────────────────────────────────────────── */}
-        <header style={{height:62,background:'white',borderBottom:'1px solid #EAEDF4',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',flexShrink:0,boxShadow:'0 1px 3px rgba(16,24,40,.05)'}}>
-          <div style={{display:'flex',alignItems:'center',gap:8,fontSize:14,color:'#94A3B8'}}>
-            <IcHome size={15}/><span style={{color:'#CBD5E1'}}>/</span>
-            <span style={{fontWeight:700,color:'#1E293B',fontSize:15}}>{view==='dash'?'Request':view==='donelist'?'Data':view==='perf'?'Dashboard':'Setting'}</span>
+        <header style={{height:60,background:'rgba(242,242,247,.8)',backdropFilter:'saturate(180%) blur(22px)',WebkitBackdropFilter:'saturate(180%) blur(22px)',borderBottom:'1px solid rgba(0,0,0,.07)',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',flexShrink:0,zIndex:9}}>
+          <div style={{display:'flex',alignItems:'center',gap:9}}>
+            <span style={{fontWeight:700,color:'#1C1C1E',fontSize:21,letterSpacing:-.5}}>{view==='dash'?'Request':view==='donelist'?'Data':view==='perf'?'Dashboard':'Setting'}</span>
           </div>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <button style={{padding:9,borderRadius:10,background:'none',border:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcBell size={18}/></button>
-            <button onClick={()=>setModal(true)} style={{
-              display:'flex',alignItems:'center',gap:7,background:'#3B82F6',color:'white',
-              border:'none',borderRadius:10,padding:'10px 18px',fontSize:14,fontWeight:600,cursor:'pointer',
-              boxShadow:'0 4px 12px -2px rgba(59,130,246,.45)'
+            <button className="nbtn" style={{padding:8,borderRadius:'50%',background:'rgba(120,120,128,.12)',border:'none',color:'#3C3C43',cursor:'pointer',display:'flex'}}><IcBell size={18}/></button>
+            <button className="pbtn" onClick={()=>setModal(true)} style={{
+              display:'flex',alignItems:'center',gap:6,background:'#007AFF',color:'white',
+              border:'none',borderRadius:980,padding:'9px 17px',fontSize:14.5,fontWeight:600,cursor:'pointer',
+              boxShadow:'0 4px 12px -3px rgba(0,122,255,.5)'
             }}><IcPlus size={16}/>New Request</button>
           </div>
         </header>
@@ -487,33 +493,33 @@ function App() {
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     {[{val:fA,set:setFA,opts:assignees.map(a=>a.name),ph:'All assignees'},{val:fP,set:setFP,opts:partners.map(p=>p.name),ph:'All partners'}].map((f,i)=>(
                       <select key={i} value={f.val} onChange={e=>f.set(e.target.value)} className="selbtn"
-                        style={{fontSize:13,fontWeight:500,border:'1px solid #E2E8F0',borderRadius:10,padding:'10px 38px 10px 16px',minWidth:154,color:'#475569',cursor:'pointer',boxShadow:'0 1px 2px rgba(16,24,40,.04)',appearance:'none',WebkitAppearance:'none',MozAppearance:'none',backgroundColor:'white',backgroundImage:`url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%2394A3B8'%20stroke-width='2.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpolyline%20points='6%209%2012%2015%2018%209'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 13px center',backgroundSize:'15px'}}>
+                        style={{fontSize:13.5,fontWeight:500,border:'1px solid rgba(0,0,0,.08)',borderRadius:12,padding:'10px 38px 10px 15px',minWidth:154,color:'#1C1C1E',cursor:'pointer',boxShadow:'0 1px 2px rgba(0,0,0,.04)',appearance:'none',WebkitAppearance:'none',MozAppearance:'none',backgroundColor:'#fff',backgroundImage:`url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%238E8E93'%20stroke-width='2.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpolyline%20points='6%209%2012%2015%2018%209'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 13px center',backgroundSize:'15px'}}>
                         <option value="">{f.ph}</option>
                         {f.opts.map(o=><option key={o}>{o}</option>)}
                       </select>
                     ))}
                     {(fA||fP)&&(
-                      <button onClick={()=>{setFA('');setFP('');}}
-                        style={{padding:'10px 18px',borderRadius:10,border:'1px solid #FECACA',background:'#FEF2F2',color:'#EF4444',fontSize:13,fontWeight:600,cursor:'pointer'}}>
+                      <button className="pbtn" onClick={()=>{setFA('');setFP('');}}
+                        style={{padding:'10px 17px',borderRadius:12,border:'none',background:'rgba(255,59,48,.1)',color:'#FF3B30',fontSize:13.5,fontWeight:600,cursor:'pointer'}}>
                         Reset
                       </button>
                     )}
                   </div>
                   {/* Week nav */}
-                  <div style={{display:'flex',alignItems:'center',gap:6,background:'white',border:'1px solid #E2E8F0',borderRadius:10,padding:'5px 9px',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:4,background:'#fff',border:'1px solid rgba(0,0,0,.08)',borderRadius:13,padding:'4px 6px',boxShadow:'0 1px 2px rgba(0,0,0,.04)'}}>
                     <button className="nbtn" onClick={()=>setWeekOff(v=>v-1)}
-                      style={{padding:6,borderRadius:7,border:'none',background:'none',display:'flex',color:'#64748B'}}>
+                      style={{padding:7,borderRadius:9,border:'none',background:'none',display:'flex',color:'#007AFF'}}>
                       <IcChevL size={16}/>
                     </button>
                     <button onClick={()=>setWeekOff(0)} style={{
-                      padding:'5px 14px',borderRadius:7,border:'none',cursor:'pointer',
-                      background:weekOff===0?'#EFF6FF':'none',
-                      color:weekOff===0?'#3B82F6':'#64748B',
-                      fontSize:13,fontWeight:600,transition:'all .15s'
+                      padding:'6px 14px',borderRadius:9,border:'none',cursor:'pointer',
+                      background:weekOff===0?'rgba(0,122,255,.12)':'none',
+                      color:weekOff===0?'#007AFF':'#5C5C66',
+                      fontSize:13.5,fontWeight:600,transition:'all .15s'
                     }}>This week</button>
-                    <span style={{fontSize:13,color:'#334155',minWidth:178,textAlign:'center',fontWeight:600}}>{weekLabel}</span>
+                    <span style={{fontSize:13.5,color:'#1C1C1E',minWidth:178,textAlign:'center',fontWeight:600}}>{weekLabel}</span>
                     <button className="nbtn" onClick={()=>setWeekOff(v=>v+1)}
-                      style={{padding:6,borderRadius:7,border:'none',background:'none',display:'flex',color:'#64748B'}}>
+                      style={{padding:7,borderRadius:9,border:'none',background:'none',display:'flex',color:'#007AFF'}}>
                       <IcChevR size={16}/>
                     </button>
                   </div>
@@ -524,34 +530,34 @@ function App() {
                   <div style={{minWidth:LABEL_W+COL_W*7}}>
 
                     {/* ── Header (sticky top) ── */}
-                    <div style={{display:'flex',height:HEADER_H,position:'sticky',top:0,zIndex:4,background:'#F8FAFC',borderBottom:'2px solid #E2E8F0'}}>
-                      <div style={{width:LABEL_W,flexShrink:0,position:'sticky',left:0,zIndex:5,background:'#F8FAFC',borderRight:'2px solid #E2E8F0',display:'flex',alignItems:'center',padding:'0 18px',gap:8}}>
-                        <span style={{fontSize:12,fontWeight:700,color:'#94A3B8',letterSpacing:1,textTransform:'uppercase'}}>PROJECT</span>
-                        <span style={{marginLeft:'auto',fontSize:12,color:'#CBD5E1'}}>{filtered.length}</span>
+                    <div style={{display:'flex',height:HEADER_H,position:'sticky',top:0,zIndex:4,background:'#F5F5F7',borderBottom:'2px solid #E5E5EA'}}>
+                      <div style={{width:LABEL_W,flexShrink:0,position:'sticky',left:0,zIndex:5,background:'#F5F5F7',borderRight:'2px solid #E5E5EA',display:'flex',alignItems:'center',padding:'0 18px',gap:8}}>
+                        <span style={{fontSize:12,fontWeight:700,color:'#8E8E93',letterSpacing:1,textTransform:'uppercase'}}>PROJECT</span>
+                        <span style={{marginLeft:'auto',fontSize:12,color:'#C7C7CC'}}>{filtered.length}</span>
                       </div>
                       {weekDates.map(d=>(
-                        <div key={d.key} style={{width:COL_W,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,borderRight:'1px solid #EEF1F8',background:d.isToday?'rgba(59,130,246,.06)':d.isSat||d.isSun?'#FBFCFE':'transparent'}}>
-                          <span style={{fontSize:11,fontWeight:600,letterSpacing:.6,textTransform:'uppercase',color:d.isSun?'#F87171':d.isSat?'#60A5FA':'#94A3B8'}}>{d.day}</span>
+                        <div key={d.key} style={{width:COL_W,flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,borderRight:'1px solid #F2F2F7',background:d.isToday?'rgba(0,122,255,.06)':d.isSat||d.isSun?'#FAFAFC':'transparent'}}>
+                          <span style={{fontSize:11,fontWeight:600,letterSpacing:.6,textTransform:'uppercase',color:d.isSun?'#FF3B30':d.isSat?'#4DA2FF':'#8E8E93'}}>{d.day}</span>
                           <span style={{fontSize:13,fontWeight:d.isToday?700:600,lineHeight:1,padding:d.isToday?'4px 10px':'4px 2px',borderRadius:999,
-                            background:d.isToday?'#3B82F6':'transparent',
-                            color:d.isToday?'white':(d.isSun?'#EF4444':d.isSat?'#3B82F6':'#334155'),
-                            boxShadow:d.isToday?'0 3px 8px -2px rgba(59,130,246,.55)':'none',transition:'all .15s',whiteSpace:'nowrap'}}>{d.label}</span>
+                            background:d.isToday?'#007AFF':'transparent',
+                            color:d.isToday?'white':(d.isSun?'#FF3B30':d.isSat?'#007AFF':'#3C3C43'),
+                            boxShadow:d.isToday?'0 3px 8px -2px rgba(0,122,255,.55)':'none',transition:'all .15s',whiteSpace:'nowrap'}}>{d.label}</span>
                         </div>
                       ))}
                     </div>
 
                     {/* ── Rows ── */}
                     {ganttRows.length===0
-                      ? <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:120,color:'#CBD5E1',fontSize:13}}>No projects registered</div>
+                      ? <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:120,color:'#C7C7CC',fontSize:13}}>No projects registered</div>
                       : ganttRows.map(row=>{
 
                         /* Assignee group header row */
                         if(row.type==='grp') return (
-                          <div key={`g-${row.assignee}`} style={{display:'flex',height:GRP_H,background:'#EFF6FF',borderBottom:'1px solid #DBEAFE'}}>
-                            <div style={{width:LABEL_W,flexShrink:0,position:'sticky',left:0,zIndex:2,background:'#EFF6FF',borderRight:'2px solid #BFDBFE',display:'flex',alignItems:'center',padding:'0 12px',gap:8}}>
-                              <div style={{width:25,height:25,borderRadius:'50%',background:'linear-gradient(135deg,#3B82F6,#8B5CF6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'white',flexShrink:0}}>{row.assignee[0]}</div>
-                              <span style={{fontSize:13,fontWeight:700,color:'#1D4ED8'}}>{row.assignee}</span>
-                              <span style={{marginLeft:'auto',fontSize:11,color:'#93C5FD',fontWeight:600}}>{row.cnt}</span>
+                          <div key={`g-${row.assignee}`} style={{display:'flex',height:GRP_H,background:'#E9F2FF',borderBottom:'1px solid #D6E9FF'}}>
+                            <div style={{width:LABEL_W,flexShrink:0,position:'sticky',left:0,zIndex:2,background:'#E9F2FF',borderRight:'2px solid #B3D7FF',display:'flex',alignItems:'center',padding:'0 12px',gap:8}}>
+                              <div style={{width:25,height:25,borderRadius:'50%',background:'linear-gradient(135deg,#007AFF,#AF52DE)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'white',flexShrink:0}}>{row.assignee[0]}</div>
+                              <span style={{fontSize:13,fontWeight:700,color:'#0062D6'}}>{row.assignee}</span>
+                              <span style={{marginLeft:'auto',fontSize:11,color:'#66B0FF',fontWeight:600}}>{row.cnt}</span>
                             </div>
                             <div style={{flex:1}}/>
                           </div>
@@ -570,18 +576,18 @@ function App() {
                         const cs=Math.max(0,s), ce=Math.min(7,e);
                         const hasBar=ce>0&&cs<7;
                         return (
-                          <div key={p.id} style={{display:'flex',height:ROW_H,borderBottom:'1px solid #F1F5F9',background:isSel?'#EFF6FF':'white',transition:'background .12s'}}>
+                          <div key={p.id} style={{display:'flex',height:ROW_H,borderBottom:'1px solid #ECECEF',background:isSel?'#E9F2FF':'white',transition:'background .12s'}}>
 
                             {/* Left label (sticky) */}
                             <div className="row-item" onClick={()=>setSel(isSel?null:p)} style={{
                               width:LABEL_W,flexShrink:0,position:'sticky',left:0,zIndex:2,
-                              background:isSel?'#EFF6FF':'white',
-                              borderRight:'2px solid #E2E8F0',
-                              borderLeft:`3px solid ${isSel?'#3B82F6':'transparent'}`,
+                              background:isSel?'#E9F2FF':'white',
+                              borderRight:'2px solid #E5E5EA',
+                              borderLeft:`3px solid ${isSel?'#007AFF':'transparent'}`,
                               display:'flex',flexDirection:'row',alignItems:'center',
                               padding:'0 12px',gap:7,cursor:'pointer',
                             }}>
-                              <span style={{fontSize:13,fontWeight:700,color:'#1E293B',whiteSpace:'nowrap',flexShrink:0}}>{p.partner}</span>
+                              <span style={{fontSize:13,fontWeight:700,color:'#1C1C1E',whiteSpace:'nowrap',flexShrink:0}}>{p.partner}</span>
                               {cat&&<span style={{marginLeft:'auto',fontSize:10,padding:'2px 8px',borderRadius:999,color:'white',background:cat.color,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',fontWeight:600,minWidth:0,flexShrink:1}}>{cat.name}</span>}
                             </div>
 
@@ -589,7 +595,7 @@ function App() {
                             <div style={{position:'relative',flex:1,minWidth:COL_W*7}}>
                               <div style={{position:'absolute',inset:0,display:'flex',pointerEvents:'none'}}>
                                 {weekDates.map(d=>(
-                                  <div key={d.key} style={{width:COL_W,flexShrink:0,height:'100%',borderRight:'1px solid #F8FAFC',background:d.isToday?'rgba(59,130,246,.04)':d.isSat||d.isSun?'rgba(0,0,0,.015)':'transparent'}}/>
+                                  <div key={d.key} style={{width:COL_W,flexShrink:0,height:'100%',borderRight:'1px solid #F5F5F7',background:d.isToday?'rgba(0,122,255,.04)':d.isSat||d.isSun?'rgba(0,0,0,.015)':'transparent'}}/>
                                 ))}
                               </div>
                               {hasBar&&(
@@ -611,9 +617,9 @@ function App() {
                               )}
                               {!hasBar&&(
                                 <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',padding:'0 14px',pointerEvents:'none'}}>
-                                  <span style={{fontSize:11,color:'#94A3B8'}}>
-                                    <b style={{color:'#64748B'}}>{storeMain(p)}</b>
-                                    <span style={{fontStyle:'italic',color:'#CBD5E1',marginLeft:6}}>{e<=0?`← ended ${p.end}`:cs>=7?`→ starts ${p.start}`:''}</span>
+                                  <span style={{fontSize:11,color:'#8E8E93'}}>
+                                    <b style={{color:'#6C6C70'}}>{storeMain(p)}</b>
+                                    <span style={{fontStyle:'italic',color:'#C7C7CC',marginLeft:6}}>{e<=0?`← ended ${p.end}`:cs>=7?`→ starts ${p.start}`:''}</span>
                                   </span>
                                 </div>
                               )}
@@ -629,13 +635,13 @@ function App() {
               {/* ── Contact history panel ─────────────────────────────── */}
               {sel&&liveSel&&(
                 <div style={{...card,width:296,display:'flex',flexDirection:'column',flexShrink:0,overflow:'hidden'}}>
-                  <div style={{padding:'14px 16px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+                  <div style={{padding:'14px 16px',borderBottom:'1px solid #ECECEF',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
                     <div style={{minWidth:0,flex:1}}>
-                      <div style={{fontWeight:700,color:'#1E293B',fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{storeAll(liveSel)}{liveSel.memo&&<span style={{fontSize:12,fontWeight:400,color:'#64748B',marginLeft:8}}>{liveSel.memo}</span>}</div>
+                      <div style={{fontWeight:700,color:'#1C1C1E',fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{storeAll(liveSel)}{liveSel.memo&&<span style={{fontSize:12,fontWeight:400,color:'#6C6C70',marginLeft:8}}>{liveSel.memo}</span>}</div>
                       <div style={{display:'flex',alignItems:'center',gap:5,marginTop:5,flexWrap:'wrap'}}>
-                        <span style={{fontSize:11,color:'#94A3B8'}}>{liveSel.partner}</span>
-                        <span style={{color:'#CBD5E1'}}>·</span>
-                        <span style={{fontSize:11,color:'#94A3B8'}}>{liveSel.assignee}</span>
+                        <span style={{fontSize:11,color:'#8E8E93'}}>{liveSel.partner}</span>
+                        <span style={{color:'#C7C7CC'}}>·</span>
+                        <span style={{fontSize:11,color:'#8E8E93'}}>{liveSel.assignee}</span>
                         <span style={{fontSize:10,padding:'2px 7px',borderRadius:999,color:ST[liveSel.status].text,background:ST[liveSel.status].bg,fontWeight:600}}>
                           {ST[liveSel.status].label}
                         </span>
@@ -643,10 +649,10 @@ function App() {
                     </div>
                     <div style={{display:'flex',alignItems:'center',gap:2,flexShrink:0}}>
                       <button className="delbtn" onClick={()=>delProj(sel.id)} title="Delete request"
-                        style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex'}}>
+                        style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex'}}>
                         <IcTrash size={15}/>
                       </button>
-                      <button onClick={()=>setSel(null)} title="Close" style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex'}}>
+                      <button onClick={()=>setSel(null)} title="Close" style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex'}}>
                         <IcX size={16}/>
                       </button>
                     </div>
@@ -659,9 +665,9 @@ function App() {
                         <button key={k} onClick={()=>setStatus(sel.id,k)} style={{
                           display:'flex',alignItems:'center',gap:5,padding:'5px 10px',borderRadius:999,cursor:'pointer',
                           fontSize:11,fontWeight:700,transition:'all .12s',
-                          border:`1px solid ${on?ST[k].color:'#E2E8F0'}`,
+                          border:`1px solid ${on?ST[k].color:'#E5E5EA'}`,
                           background:on?ST[k].color:'white',
-                          color:on?'white':'#64748B',
+                          color:on?'white':'#6C6C70',
                           boxShadow:on?`0 2px 6px -1px ${ST[k].color}80`:'none'}}>
                           <span style={{width:7,height:7,borderRadius:'50%',background:on?'white':ST[k].color,flexShrink:0}}/>
                           {ST[k].label}
@@ -670,36 +676,36 @@ function App() {
                     })}
                   </div>
                   {/* Resolve date + button */}
-                  <div style={{padding:'8px 14px 10px',borderBottom:'1px solid #F1F5F9',display:'flex',gap:8,alignItems:'center',flexShrink:0}}>
+                  <div style={{padding:'8px 14px 10px',borderBottom:'1px solid #ECECEF',display:'flex',gap:8,alignItems:'center',flexShrink:0}}>
                     <input type="date" value={completeDate} onChange={e=>setCompleteDate(e.target.value)}
-                      style={{flex:1,fontSize:13,border:'1px solid #E2E8F0',borderRadius:10,padding:'8px 11px',background:'#F8FAFC',color:'#334155',outline:'none'}}/>
+                      style={{flex:1,fontSize:13,border:'1px solid #E5E5EA',borderRadius:10,padding:'8px 11px',background:'#F5F5F7',color:'#3C3C43',outline:'none'}}/>
                     <button onClick={()=>complete(sel.id,completeDate)}
                       style={{display:'flex',alignItems:'center',gap:5,padding:'8px 15px',borderRadius:10,
-                        background:'#10B981',border:'none',color:'white',fontSize:13,fontWeight:600,cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',boxShadow:'0 4px 12px -2px rgba(16,185,129,.45)'}}>
+                        background:'#34C759',border:'none',color:'white',fontSize:13,fontWeight:600,cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',boxShadow:'0 4px 12px -2px rgba(52,199,89,.45)'}}>
                       <IcCheck size={14}/>Resolve
                     </button>
                   </div>
                   <div ref={histRef} style={{flex:1,overflowY:'auto',padding:'14px 16px',display:'flex',flexDirection:'column',gap:12}}>
                     {!liveSel.hist.length
-                      ? <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,gap:8,color:'#CBD5E1',paddingTop:40}}>
+                      ? <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,gap:8,color:'#C7C7CC',paddingTop:40}}>
                           <IcMsg size={28}/><span style={{fontSize:12}}>No history</span>
                         </div>
                       : liveSel.hist.map(h=>(
                         <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
-                          <div style={{fontSize:11,color:'#94A3B8',marginBottom:3}}>{h.by}</div>
+                          <div style={{fontSize:11,color:'#8E8E93',marginBottom:3}}>{h.by}</div>
                           {h.deleted
-                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F8FAFC',color:'#CBD5E1',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F5F5F7',color:'#C7C7CC',border:'1px dashed #E5E5EA'}}>Message deleted</div>
                             : <div style={{
                                 maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
-                                background:h.by==='Me'?'#3B82F6':'#F1F5F9',
-                                color:h.by==='Me'?'white':'#334155',
+                                background:h.by==='Me'?'#007AFF':'#ECECEF',
+                                color:h.by==='Me'?'white':'#3C3C43',
                                 borderBottomRightRadius:h.by==='Me'?3:12,
                                 borderBottomLeftRadius:h.by==='Me'?12:3,
                               }}>{h.text}</div>}
                           <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
-                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
+                            <span style={{fontSize:10,color:'#C7C7CC'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
                             {!h.deleted&&<button className="delbtn" onClick={()=>delHist(sel.id,h.id)} title="Delete"
-                              style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',alignItems:'center'}}>
+                              style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex',alignItems:'center'}}>
                               <IcTrash size={11}/>
                             </button>}
                           </div>
@@ -707,12 +713,12 @@ function App() {
                       ))
                     }
                   </div>
-                  <div style={{padding:12,borderTop:'1px solid #F1F5F9',display:'flex',gap:8}}>
+                  <div style={{padding:12,borderTop:'1px solid #ECECEF',display:'flex',gap:8}}>
                     <input value={msg} onChange={e=>setMsg(e.target.value)}
                       onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&send()}
                       placeholder="Type a message..."
-                      style={{flex:1,fontSize:13,border:'1px solid #E2E8F0',borderRadius:10,padding:'10px 12px',background:'#F8FAFC'}}/>
-                    <button onClick={send} style={{padding:8,borderRadius:8,background:'#3B82F6',border:'none',cursor:'pointer',display:'flex',color:'white',flexShrink:0}}>
+                      style={{flex:1,fontSize:13,border:'1px solid #E5E5EA',borderRadius:10,padding:'10px 12px',background:'#F5F5F7'}}/>
+                    <button onClick={send} style={{padding:8,borderRadius:8,background:'#007AFF',border:'none',cursor:'pointer',display:'flex',color:'white',flexShrink:0}}>
                       <IcSend size={13}/>
                     </button>
                   </div>
@@ -728,35 +734,36 @@ function App() {
                 {/* Toolbar: scope switch + date range + export */}
                 <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0,flexWrap:'wrap'}}>
                   {/* Total / Ongoing / Resolved switch */}
-                  <div style={{display:'flex',border:'1px solid #E2E8F0',borderRadius:10,overflow:'hidden',background:'white',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
+                  <div style={{display:'flex',gap:2,borderRadius:11,padding:2,background:'rgba(118,118,128,.12)'}}>
                     {[['total','Total'],['ongoing','Ongoing'],['resolved','Resolved']].map(([v,l])=>(
                       <button key={v} onClick={()=>setResScope(v)} style={{
-                        padding:'9px 18px',border:'none',cursor:'pointer',fontSize:13,fontWeight:600,transition:'all .15s',
-                        background:resScope===v?'#3B82F6':'transparent',
-                        color:resScope===v?'white':'#64748B'}}>{l}</button>
+                        padding:'7px 18px',border:'none',cursor:'pointer',fontSize:13.5,fontWeight:resScope===v?600:500,transition:'all .2s',borderRadius:9,
+                        background:resScope===v?'#fff':'transparent',
+                        boxShadow:resScope===v?'0 1px 4px rgba(0,0,0,.12),0 0 1px rgba(0,0,0,.18)':'none',
+                        color:resScope===v?'#1C1C1E':'#5C5C66'}}>{l}</button>
                     ))}
                   </div>
                   {/* Count */}
-                  <span style={{fontSize:14,color:'#94A3B8'}}><b style={{color:'#334155'}}>{dataRows.length}</b> shown</span>
+                  <span style={{fontSize:14,color:'#8E8E93'}}><b style={{color:'#3C3C43'}}>{dataRows.length}</b> shown</span>
                   {(Object.keys(colFilters).length>0||sortState.key)&&(
                     <button onClick={clearAllFilters}
-                      style={{padding:'7px 12px',borderRadius:8,border:'1px solid #FECACA',background:'#FEF2F2',color:'#EF4444',fontSize:12,fontWeight:600,cursor:'pointer'}}>Clear filters</button>
+                      style={{padding:'7px 12px',borderRadius:8,border:'1px solid #FFD3D0',background:'#FFECEB',color:'#FF3B30',fontSize:12,fontWeight:600,cursor:'pointer'}}>Clear filters</button>
                   )}
                   {/* Date range + Export (right) */}
                   <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
-                    <div style={{display:'flex',alignItems:'center',gap:6,background:'white',border:'1px solid #E2E8F0',borderRadius:10,padding:'8px 12px',boxShadow:'0 1px 2px rgba(16,24,40,.04)'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6,background:'#fff',border:'1px solid rgba(0,0,0,.08)',borderRadius:12,padding:'8px 12px',boxShadow:'0 1px 2px rgba(0,0,0,.04)'}}>
                       <input type="date" value={resRange.from} onChange={e=>setResRange(v=>({...v,from:e.target.value}))}
-                        style={{fontSize:13,border:'none',background:'none',color:'#334155',outline:'none',cursor:'pointer'}}/>
-                      <span style={{color:'#CBD5E1',fontSize:13}}>~</span>
+                        style={{fontSize:13,border:'none',background:'none',color:'#3C3C43',outline:'none',cursor:'pointer'}}/>
+                      <span style={{color:'#C7C7CC',fontSize:13}}>~</span>
                       <input type="date" value={resRange.to} onChange={e=>setResRange(v=>({...v,to:e.target.value}))}
-                        style={{fontSize:13,border:'none',background:'none',color:'#334155',outline:'none',cursor:'pointer'}}/>
+                        style={{fontSize:13,border:'none',background:'none',color:'#3C3C43',outline:'none',cursor:'pointer'}}/>
                       {(resRange.from||resRange.to)&&(
                         <button onClick={()=>setResRange({from:'',to:''})} title="Clear range"
-                          style={{padding:2,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex'}}><IcX size={14}/></button>
+                          style={{padding:2,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex'}}><IcX size={14}/></button>
                       )}
                     </div>
-                    <button onClick={exportData}
-                      style={{display:'flex',alignItems:'center',gap:6,padding:'9px 16px',borderRadius:10,border:'1px solid #A7F3D0',background:'#ECFDF5',color:'#047857',fontSize:13,fontWeight:600,cursor:'pointer'}}>
+                    <button className="pbtn" onClick={exportData}
+                      style={{display:'flex',alignItems:'center',gap:6,padding:'9px 16px',borderRadius:980,border:'none',background:'#34C759',color:'#fff',fontSize:13.5,fontWeight:600,cursor:'pointer',boxShadow:'0 4px 12px -3px rgba(52,199,89,.5)'}}>
                       <IcArchive size={14}/>Export Excel
                     </button>
                   </div>
@@ -770,13 +777,13 @@ function App() {
                     return (
                       <div style={{minWidth:SHEET_W}}>
                         {/* Header (sticky top) + drag-to-resize handles */}
-                        <div style={{position:'sticky',top:0,zIndex:2,background:'#F8FAFC',borderBottom:'2px solid #E2E8F0',display:'grid',gridTemplateColumns:GCOLS,padding:'13px 16px'}}>
+                        <div style={{position:'sticky',top:0,zIndex:2,background:'#F5F5F7',borderBottom:'2px solid #E5E5EA',display:'grid',gridTemplateColumns:GCOLS,padding:'13px 16px'}}>
                           {HEADERS.map((h,i)=>{const ck=COLKEYS[i];const filtered=!!colFilters[ck];const sorted=sortState.key===ck;return (
                             <div key={h} style={{position:'relative',display:'flex',alignItems:'center',gap:3,minWidth:0,paddingRight:12}}>
-                              <span style={{fontSize:12,fontWeight:700,color:'#64748B',letterSpacing:.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h}</span>
-                              {sorted&&<span style={{fontSize:9,color:'#3B82F6',flexShrink:0}}>{sortState.dir==='desc'?'▼':'▲'}</span>}
+                              <span style={{fontSize:12,fontWeight:700,color:'#6C6C70',letterSpacing:.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h}</span>
+                              {sorted&&<span style={{fontSize:9,color:'#007AFF',flexShrink:0}}>{sortState.dir==='desc'?'▼':'▲'}</span>}
                               <button className="nbtn" onClick={e=>openFilterMenu(ck,e)} title="Filter"
-                                style={{padding:3,borderRadius:6,border:'1px solid '+(filtered?'#BFDBFE':'#E2E8F0'),background:filtered?'#EFF6FF':'white',cursor:'pointer',color:filtered?'#3B82F6':'#64748B',display:'flex',flexShrink:0}}>
+                                style={{padding:3,borderRadius:6,border:'1px solid '+(filtered?'#B3D7FF':'#E5E5EA'),background:filtered?'#E9F2FF':'white',cursor:'pointer',color:filtered?'#007AFF':'#6C6C70',display:'flex',flexShrink:0}}>
                                 <IcFilter size={13}/>
                               </button>
                               <div className="colresize" onMouseDown={e=>startResize(i,e)} title="Drag to resize"
@@ -787,22 +794,22 @@ function App() {
                           );})}
                         </div>
                         {!dataRows.length
-                          ? <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 0',color:'#94A3B8',gap:8}}><IcArchive size={28}/><span style={{fontSize:13}}>No projects</span></div>
+                          ? <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 0',color:'#8E8E93',gap:8}}><IcArchive size={28}/><span style={{fontSize:13}}>No projects</span></div>
                           : dataRows.map(p=>{
                             const cat=catBy(p.catId);
                             const st=ST[p.status];
                             const isSel=selDone?.id===p.id&&p._resolved;
                             return (
                               <div key={(p._resolved?'r':'o')+p.id} onClick={()=>{if(p._resolved)setSelDone(isSel?null:p);}}
-                                style={{display:'grid',gridTemplateColumns:GCOLS,padding:'10px 16px',borderBottom:'1px solid #F1F5F9',cursor:p._resolved?'pointer':'default',alignItems:'center',background:isSel?'#EFF6FF':'white',transition:'background .15s'}}>
-                                <span style={{fontSize:14,color:'#334155',fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.assignee}</span>
-                                <span style={{fontSize:14,color:'#334155',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.partner}</span>
-                                <span style={{fontSize:14,color:'#334155',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{cat?cat.name:'–'}</span>
-                                <span style={{fontSize:14,color:'#1E293B',fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{storeMain(p)}</span>
-                                <span style={{fontSize:13,color:'#64748B',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.memo||'–'}</span>
-                                <span style={{fontSize:13,color:'#94A3B8',paddingRight:10}}>{p.start||'–'}</span>
-                                <span style={{fontSize:13,fontWeight:p._resolved?400:600,color:p._resolved?'#94A3B8':(st?st.dark:'#94A3B8'),overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p._resolved?(p.doneAt||'–'):(st?st.label:'–')}</span>
-                                <span style={{fontSize:14,color:p._resolved?'#3B82F6':'#94A3B8',fontWeight:700}}>{p._days!==''?`${p._days}d`:'–'}</span>
+                                style={{display:'grid',gridTemplateColumns:GCOLS,padding:'10px 16px',borderBottom:'1px solid #ECECEF',cursor:p._resolved?'pointer':'default',alignItems:'center',background:isSel?'#E9F2FF':'white',transition:'background .15s'}}>
+                                <span style={{fontSize:14,color:'#3C3C43',fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.assignee}</span>
+                                <span style={{fontSize:14,color:'#3C3C43',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.partner}</span>
+                                <span style={{fontSize:14,color:'#3C3C43',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{cat?cat.name:'–'}</span>
+                                <span style={{fontSize:14,color:'#1C1C1E',fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{storeMain(p)}</span>
+                                <span style={{fontSize:13,color:'#6C6C70',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p.memo||'–'}</span>
+                                <span style={{fontSize:13,color:'#8E8E93',paddingRight:10}}>{p.start||'–'}</span>
+                                <span style={{fontSize:13,fontWeight:p._resolved?400:600,color:p._resolved?'#8E8E93':(st?st.dark:'#8E8E93'),overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingRight:10}}>{p._resolved?(p.doneAt||'–'):(st?st.label:'–')}</span>
+                                <span style={{fontSize:14,color:p._resolved?'#007AFF':'#8E8E93',fontWeight:700}}>{p._days!==''?`${p._days}d`:'–'}</span>
                               </div>
                             );
                           })}
@@ -816,56 +823,56 @@ function App() {
               {selDone&&(
                 <div style={{...card,width:300,display:'flex',flexDirection:'column',flexShrink:0,overflow:'hidden'}}>
                   {/* Panel header */}
-                  <div style={{padding:'14px 16px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8,flexShrink:0}}>
+                  <div style={{padding:'14px 16px',borderBottom:'1px solid #ECECEF',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8,flexShrink:0}}>
                     <div style={{minWidth:0,flex:1}}>
-                      <div style={{fontWeight:700,color:'#1E293B',fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                      <div style={{fontWeight:700,color:'#1C1C1E',fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
                         {storeAll(selDone)}
-                        {selDone.memo&&<span style={{fontSize:12,fontWeight:400,color:'#64748B',marginLeft:8}}>{selDone.memo}</span>}
+                        {selDone.memo&&<span style={{fontSize:12,fontWeight:400,color:'#6C6C70',marginLeft:8}}>{selDone.memo}</span>}
                       </div>
                       <div style={{display:'flex',alignItems:'center',gap:5,marginTop:5,flexWrap:'wrap'}}>
-                        <span style={{fontSize:11,color:'#94A3B8'}}>{selDone.partner}</span>
-                        <span style={{color:'#CBD5E1'}}>·</span>
-                        <span style={{fontSize:11,color:'#94A3B8'}}>{selDone.assignee}</span>
+                        <span style={{fontSize:11,color:'#8E8E93'}}>{selDone.partner}</span>
+                        <span style={{color:'#C7C7CC'}}>·</span>
+                        <span style={{fontSize:11,color:'#8E8E93'}}>{selDone.assignee}</span>
                         {(()=>{const c=catBy(selDone.catId);return c?<span style={{fontSize:10,padding:'2px 7px',borderRadius:999,color:'white',background:c.color}}>{c.name}</span>:null;})()}
                       </div>
                     </div>
-                    <button onClick={()=>setSelDone(null)} style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',flexShrink:0}}>
+                    <button onClick={()=>setSelDone(null)} style={{padding:4,borderRadius:6,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex',flexShrink:0}}>
                       <IcX size={16}/>
                     </button>
                   </div>
                   {/* Reopen / Delete buttons */}
-                  <div style={{padding:'10px 16px',borderBottom:'1px solid #F1F5F9',flexShrink:0,display:'flex',gap:8}}>
+                  <div style={{padding:'10px 16px',borderBottom:'1px solid #ECECEF',flexShrink:0,display:'flex',gap:8}}>
                     <button onClick={()=>revertDone(selDone.id)}
                       style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'7px 0',borderRadius:8,
-                        border:'1px solid #F59E0B',background:'#FFFBEB',color:'#D97706',fontSize:12,fontWeight:600,cursor:'pointer'}}>
+                        border:'1px solid #FF9500',background:'#FFF4E5',color:'#B25000',fontSize:12,fontWeight:600,cursor:'pointer'}}>
                       <IcRefresh size={13}/>Reopen
                     </button>
                     <button onClick={()=>delDoneProj(selDone.id)}
                       style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'7px 0',borderRadius:8,
-                        border:'1px solid #FECACA',background:'#FEF2F2',color:'#EF4444',fontSize:12,fontWeight:600,cursor:'pointer'}}>
+                        border:'1px solid #FFD3D0',background:'#FFECEB',color:'#FF3B30',fontSize:12,fontWeight:600,cursor:'pointer'}}>
                       <IcTrash size={13}/>Delete
                     </button>
                   </div>
                   {/* History list */}
                   <div ref={doneHistRef} style={{flex:1,overflowY:'auto',padding:'14px 16px',display:'flex',flexDirection:'column',gap:12}}>
                     {!(selDone.hist||[]).length
-                      ?<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,gap:8,color:'#CBD5E1',paddingTop:40}}>
+                      ?<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,gap:8,color:'#C7C7CC',paddingTop:40}}>
                           <IcMsg size={28}/><span style={{fontSize:12}}>No history</span>
                         </div>
                       :(selDone.hist||[]).map(h=>(
                         <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
-                          <div style={{fontSize:11,color:'#94A3B8',marginBottom:3}}>{h.by}</div>
+                          <div style={{fontSize:11,color:'#8E8E93',marginBottom:3}}>{h.by}</div>
                           {h.deleted
-                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F8FAFC',color:'#CBD5E1',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                            ? <div style={{maxWidth:'90%',padding:'8px 12px',fontSize:12,fontStyle:'italic',lineHeight:1.5,borderRadius:12,background:'#F5F5F7',color:'#C7C7CC',border:'1px dashed #E5E5EA'}}>Message deleted</div>
                             : <div style={{maxWidth:'90%',padding:'9px 13px',fontSize:13,lineHeight:1.55,borderRadius:12,
-                                background:h.by==='Me'?'#3B82F6':'#F1F5F9',color:h.by==='Me'?'white':'#334155',
+                                background:h.by==='Me'?'#007AFF':'#ECECEF',color:h.by==='Me'?'white':'#3C3C43',
                                 borderBottomRightRadius:h.by==='Me'?3:12,borderBottomLeftRadius:h.by==='Me'?12:3}}>
                                 {h.text}
                               </div>}
                           <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
-                            <span style={{fontSize:10,color:'#CBD5E1'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
+                            <span style={{fontSize:10,color:'#C7C7CC'}}>{h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</span>
                             {!h.deleted&&<button className="delbtn" onClick={()=>delDoneHist(selDone.id,h.id)} title="Delete"
-                              style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#CBD5E1',display:'flex',alignItems:'center'}}>
+                              style={{padding:0,border:'none',background:'none',cursor:'pointer',color:'#C7C7CC',display:'flex',alignItems:'center'}}>
                               <IcTrash size={11}/>
                             </button>}
                           </div>
@@ -874,12 +881,12 @@ function App() {
                     }
                   </div>
                   {/* Input */}
-                  <div style={{padding:12,borderTop:'1px solid #F1F5F9',display:'flex',gap:8,flexShrink:0}}>
+                  <div style={{padding:12,borderTop:'1px solid #ECECEF',display:'flex',gap:8,flexShrink:0}}>
                     <input value={doneMsg} onChange={e=>setDoneMsg(e.target.value)}
                       onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&addDoneHist()}
                       placeholder="Type a message..."
-                      style={{flex:1,fontSize:13,border:'1px solid #E2E8F0',borderRadius:10,padding:'10px 12px',background:'#F8FAFC',outline:'none'}}/>
-                    <button onClick={addDoneHist} style={{padding:8,borderRadius:8,background:'#3B82F6',border:'none',cursor:'pointer',display:'flex',color:'white',flexShrink:0}}>
+                      style={{flex:1,fontSize:13,border:'1px solid #E5E5EA',borderRadius:10,padding:'10px 12px',background:'#F5F5F7',outline:'none'}}/>
+                    <button onClick={addDoneHist} style={{padding:8,borderRadius:8,background:'#007AFF',border:'none',cursor:'pointer',display:'flex',color:'white',flexShrink:0}}>
                       <IcSend size={13}/>
                     </button>
                   </div>
@@ -891,34 +898,34 @@ function App() {
                 const LBL={assignee:'Assignee',partner:'Partner',category:'Category',storeId:'Store ID',memo:'Memo',start:'Start',resolved:'Resolved',days:'Days'};
                 const all=distinctVals(openCol);
                 const shown=all.filter(o=>String(o).toLowerCase().includes(fSearch.toLowerCase()));
-                const mi={width:'100%',textAlign:'left',padding:'8px 10px',border:'none',background:'none',cursor:'pointer',fontSize:13,color:'#334155',borderRadius:7,display:'flex',alignItems:'center',gap:8};
+                const mi={width:'100%',textAlign:'left',padding:'8px 10px',border:'none',background:'none',cursor:'pointer',fontSize:13,color:'#3C3C43',borderRadius:7,display:'flex',alignItems:'center',gap:8};
                 return (
                   <>
                     <div onClick={()=>setOpenCol(null)} style={{position:'fixed',inset:0,zIndex:60}}/>
-                    <div style={{position:'fixed',left:openPos.x,top:openPos.y,zIndex:61,width:250,background:'white',borderRadius:12,border:'1px solid #EAEDF4',boxShadow:'0 16px 40px -8px rgba(16,24,40,.28)',padding:8,fontSize:13}}>
-                      <div style={{fontSize:11,fontWeight:700,color:'#94A3B8',letterSpacing:.4,textTransform:'uppercase',padding:'2px 10px 6px'}}>{LBL[openCol]}</div>
-                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'asc'});setOpenCol(null);}} style={mi}><span style={{color:'#94A3B8'}}>▲</span>Sort ascending</button>
-                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'desc'});setOpenCol(null);}} style={mi}><span style={{color:'#94A3B8'}}>▼</span>Sort descending</button>
-                      <div style={{height:1,background:'#F1F5F9',margin:'6px 4px'}}/>
+                    <div style={{position:'fixed',left:openPos.x,top:openPos.y,zIndex:61,width:250,background:'rgba(255,255,255,.97)',backdropFilter:'saturate(180%) blur(20px)',WebkitBackdropFilter:'saturate(180%) blur(20px)',borderRadius:16,border:'1px solid rgba(0,0,0,.06)',boxShadow:'0 20px 50px -12px rgba(0,0,0,.3)',padding:8,fontSize:13,animation:'sheetIn .18s ease'}}>
+                      <div style={{fontSize:11,fontWeight:700,color:'#8E8E93',letterSpacing:.4,textTransform:'uppercase',padding:'2px 10px 6px'}}>{LBL[openCol]}</div>
+                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'asc'});setOpenCol(null);}} style={mi}><span style={{color:'#8E8E93'}}>▲</span>Sort ascending</button>
+                      <button className="nbtn" onClick={()=>{setSortState({key:openCol,dir:'desc'});setOpenCol(null);}} style={mi}><span style={{color:'#8E8E93'}}>▼</span>Sort descending</button>
+                      <div style={{height:1,background:'#ECECEF',margin:'6px 4px'}}/>
                       <input value={fSearch} onChange={e=>setFSearch(e.target.value)} placeholder="Search"
-                        style={{width:'calc(100% - 8px)',margin:'2px 4px 8px',fontSize:12,border:'1px solid #E2E8F0',borderRadius:8,padding:'7px 9px',outline:'none'}}/>
+                        style={{width:'calc(100% - 8px)',margin:'2px 4px 8px',fontSize:12,border:'1px solid #E5E5EA',borderRadius:8,padding:'7px 9px',outline:'none'}}/>
                       <div style={{display:'flex',alignItems:'center',gap:8,padding:'0 8px 6px',fontSize:11}}>
-                        <button onClick={()=>setDraftSel([...all])} style={{border:'none',background:'none',color:'#3B82F6',fontWeight:600,cursor:'pointer',padding:0}}>Select all</button>
-                        <span style={{color:'#CBD5E1'}}>·</span>
-                        <button onClick={()=>setDraftSel([])} style={{border:'none',background:'none',color:'#3B82F6',fontWeight:600,cursor:'pointer',padding:0}}>Clear</button>
-                        <span style={{marginLeft:'auto',color:'#94A3B8'}}>{draftSel.length}/{all.length}</span>
+                        <button onClick={()=>setDraftSel([...all])} style={{border:'none',background:'none',color:'#007AFF',fontWeight:600,cursor:'pointer',padding:0}}>Select all</button>
+                        <span style={{color:'#C7C7CC'}}>·</span>
+                        <button onClick={()=>setDraftSel([])} style={{border:'none',background:'none',color:'#007AFF',fontWeight:600,cursor:'pointer',padding:0}}>Clear</button>
+                        <span style={{marginLeft:'auto',color:'#8E8E93'}}>{draftSel.length}/{all.length}</span>
                       </div>
                       <div style={{maxHeight:208,overflowY:'auto',padding:'0 2px'}}>
                         {shown.length?shown.map(o=>{const on=draftSel.indexOf(o)>=0;return (
                           <label key={o} className="nbtn" style={{display:'flex',alignItems:'center',gap:9,padding:'7px 8px',borderRadius:7,cursor:'pointer'}}>
-                            <input type="checkbox" checked={on} onChange={()=>setDraftSel(s=>on?s.filter(x=>x!==o):[...s,o])} style={{accentColor:'#3B82F6',cursor:'pointer',width:14,height:14}}/>
-                            <span style={{fontSize:13,color:o===''?'#94A3B8':'#334155',fontStyle:o===''?'italic':'normal',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{o===''?'(blank)':o}</span>
+                            <input type="checkbox" checked={on} onChange={()=>setDraftSel(s=>on?s.filter(x=>x!==o):[...s,o])} style={{accentColor:'#007AFF',cursor:'pointer',width:14,height:14}}/>
+                            <span style={{fontSize:13,color:o===''?'#8E8E93':'#3C3C43',fontStyle:o===''?'italic':'normal',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{o===''?'(blank)':o}</span>
                           </label>
-                        );}):<div style={{padding:'12px 10px',color:'#CBD5E1',fontSize:12}}>No matches</div>}
+                        );}):<div style={{padding:'12px 10px',color:'#C7C7CC',fontSize:12}}>No matches</div>}
                       </div>
                       <div style={{display:'flex',gap:8,padding:'10px 4px 2px'}}>
-                        <button onClick={()=>setOpenCol(null)} style={{flex:1,padding:'8px 0',borderRadius:8,border:'1px solid #E2E8F0',background:'white',color:'#64748B',fontSize:13,fontWeight:600,cursor:'pointer'}}>Cancel</button>
-                        <button onClick={applyFilter} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',background:'#3B82F6',color:'white',fontSize:13,fontWeight:600,cursor:'pointer'}}>Apply</button>
+                        <button onClick={()=>setOpenCol(null)} style={{flex:1,padding:'8px 0',borderRadius:8,border:'1px solid #E5E5EA',background:'white',color:'#6C6C70',fontSize:13,fontWeight:600,cursor:'pointer'}}>Cancel</button>
+                        <button onClick={applyFilter} style={{flex:1,padding:'8px 0',borderRadius:8,border:'none',background:'#007AFF',color:'white',fontSize:13,fontWeight:600,cursor:'pointer'}}>Apply</button>
                       </div>
                     </div>
                   </>
@@ -940,19 +947,19 @@ function App() {
                   ? (_avgValid.reduce((s,p)=>s+Math.max(0,(new Date(p.doneAt)-new Date(p.start))/86400000),0)/_avgValid.length).toFixed(1)
                   : '0.0';
                 const items=[
-                  {label:'Total Projects',       value:total,    unit:'',     color:'#6366F1', bg:'#EEF2FF', pct:100},
-                  {label:'Ongoing',              value:onging,   unit:'',     color:'#3B82F6', bg:'#EFF6FF', pct:total?Math.round(onging/total*100):0},
-                  {label:'Resolved',             value:doneN,    unit:'',     color:'#10B981', bg:'#ECFDF5', pct:total?Math.round(doneN/total*100):0},
-                  {label:'Average Resolve Time', value:avgDays,  unit:'days', color:'#F59E0B', bg:'#FFFBEB', pct:60},
+                  {label:'Total Projects',       value:total,    unit:'',     color:'#5856D6', bg:'#ECECFF', pct:100},
+                  {label:'Ongoing',              value:onging,   unit:'',     color:'#007AFF', bg:'#E9F2FF', pct:total?Math.round(onging/total*100):0},
+                  {label:'Resolved',             value:doneN,    unit:'',     color:'#34C759', bg:'#E5F7EA', pct:total?Math.round(doneN/total*100):0},
+                  {label:'Average Resolve Time', value:avgDays,  unit:'days', color:'#FF9500', bg:'#FFF4E5', pct:60},
                 ];
                 return (
                   <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16,flexShrink:0}}>
                     {items.map(({label,value,unit,color,bg,pct})=>(
                       <div key={label} style={{...card,padding:'22px 24px',display:'flex',flexDirection:'column',gap:12}}>
-                        <span style={{fontSize:13,fontWeight:600,color:'#94A3B8',letterSpacing:.3}}>{label}</span>
+                        <span style={{fontSize:13,fontWeight:600,color:'#8E8E93',letterSpacing:.3}}>{label}</span>
                         <div style={{display:'flex',alignItems:'flex-end',gap:5}}>
                           <span style={{fontSize:40,fontWeight:800,color,lineHeight:1,letterSpacing:-1}}>{value}</span>
-                          {unit&&<span style={{fontSize:14,fontWeight:600,color:'#94A3B8',paddingBottom:5}}>{unit}</span>}
+                          {unit&&<span style={{fontSize:14,fontWeight:600,color:'#8E8E93',paddingBottom:5}}>{unit}</span>}
                         </div>
                         <div style={{height:6,borderRadius:3,background:bg,overflow:'hidden'}}>
                           <div style={{height:'100%',background:`linear-gradient(90deg,${color}cc,${color})`,borderRadius:3,
@@ -966,13 +973,13 @@ function App() {
 
               {/* Partner / Category tables */}
               {(()=>{
-                const grnBg='#DCFCE7', grnTx='#166534', ongBg='#DBEAFE', ongTx='#1D4ED8';
-                const HCELL={fontSize:11,fontWeight:700,color:'#64748B',letterSpacing:.2,display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'8px 4px',lineHeight:1.25};
+                const grnBg='#D4F3DC', grnTx='#248A3D', ongBg='#D6E9FF', ongTx='#0062D6';
+                const HCELL={fontSize:11,fontWeight:700,color:'#6C6C70',letterSpacing:.2,display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'8px 4px',lineHeight:1.25};
                 const numCell=(n,bg,tx)=>(
                   <div style={{display:'flex',alignItems:'center',justifyContent:'center',padding:'12px 4px'}}>
                     {n>0
                       ?<span style={{minWidth:26,textAlign:'center',fontSize:13,fontWeight:700,padding:'3px 9px',borderRadius:999,background:bg,color:tx}}>{n}</span>
-                      :<span style={{fontSize:13,color:'#CBD5E1'}}>0</span>}
+                      :<span style={{fontSize:13,color:'#C7C7CC'}}>0</span>}
                   </div>
                 );
                 const COLS='1.5fr 100px 1.1fr 1.1fr 0.95fr 1.2fr 96px';
@@ -995,14 +1002,14 @@ function App() {
                   <div style={{...card,padding:0,overflow:'hidden'}}>
                     <div style={{display:'flex',alignItems:'center',gap:8,padding:'18px 22px 14px'}}>
                       <Icon size={17} style={{color:iconColor}}/>
-                      <span style={{fontSize:15,fontWeight:700,color:'#1E293B'}}>{title}</span>
+                      <span style={{fontSize:15,fontWeight:700,color:'#1C1C1E'}}>{title}</span>
                     </div>
                     {/* Two-level header */}
-                    <div style={{display:'grid',gridTemplateColumns:COLS,background:'#F8FAFC',borderTop:'1px solid #EAEDF4',borderBottom:'2px solid #E2E8F0'}}>
-                      <div style={{gridColumn:'1',gridRow:'1 / 3',display:'flex',alignItems:'center',padding:'0 22px',fontSize:11,fontWeight:700,color:'#64748B',letterSpacing:.2}}>{firstLabel}</div>
+                    <div style={{display:'grid',gridTemplateColumns:COLS,background:'#F5F5F7',borderTop:'1px solid #E5E5EA',borderBottom:'2px solid #E5E5EA'}}>
+                      <div style={{gridColumn:'1',gridRow:'1 / 3',display:'flex',alignItems:'center',padding:'0 22px',fontSize:11,fontWeight:700,color:'#6C6C70',letterSpacing:.2}}>{firstLabel}</div>
                       <div style={{gridColumn:'2',gridRow:'1 / 3',...HCELL}}>Total request</div>
-                      <div style={{gridColumn:'3 / 7',gridRow:'1',...HCELL,borderBottom:'1px solid #E2E8F0',padding:'7px 4px',color:'#3B82F6',letterSpacing:.5}}>Ongoing</div>
-                      <div style={{gridColumn:'7',gridRow:'1 / 3',...HCELL,color:'#10B981'}}>Resolved</div>
+                      <div style={{gridColumn:'3 / 7',gridRow:'1',...HCELL,borderBottom:'1px solid #E5E5EA',padding:'7px 4px',color:'#007AFF',letterSpacing:.5}}>Ongoing</div>
+                      <div style={{gridColumn:'7',gridRow:'1 / 3',...HCELL,color:'#34C759'}}>Resolved</div>
                       {ONGOING_STATUSES.map((k,i)=>(
                         <div key={k} style={{gridColumn:`${3+i}`,gridRow:'2',...HCELL}}>
                           <span style={{display:'inline-flex',alignItems:'center',gap:4}}>
@@ -1015,14 +1022,14 @@ function App() {
                     {/* Data rows (scroll) */}
                     <div style={{maxHeight:SCROLL_H,overflowY:'auto'}}>
                     {rows.map((r,ri)=>(
-                      <div key={r.g.id} className="row-item" style={{display:'grid',gridTemplateColumns:COLS,borderBottom:ri===rows.length-1?'none':'1px solid #F1F5F9',background:'white'}}>
+                      <div key={r.g.id} className="row-item" style={{display:'grid',gridTemplateColumns:COLS,borderBottom:ri===rows.length-1?'none':'1px solid #ECECEF',background:'white'}}>
                         <div style={{display:'flex',alignItems:'center',gap:8,padding:'0 22px'}}>
                           {withDot&&<span style={{width:10,height:10,borderRadius:'50%',background:r.g.color,flexShrink:0,display:'inline-block'}}/>}
-                          <span style={{fontSize:14,fontWeight:600,color:'#334155'}}>{r.g.name}</span>
-                          {r.sub&&<span style={{fontSize:12,fontWeight:600,color:'#D97706'}}>({r.sub})</span>}
+                          <span style={{fontSize:14,fontWeight:600,color:'#3C3C43'}}>{r.g.name}</span>
+                          {r.sub&&<span style={{fontSize:12,fontWeight:600,color:'#B25000'}}>({r.sub})</span>}
                         </div>
                         <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-                          <span style={{fontSize:17,fontWeight:800,color:'#1E293B',letterSpacing:-.5}}>{r.total}</span>
+                          <span style={{fontSize:17,fontWeight:800,color:'#1C1C1E',letterSpacing:-.5}}>{r.total}</span>
                         </div>
                         {ONGOING_STATUSES.map(k=>(
                           <React.Fragment key={k}>{numCell(r.counts[k],ST[k].bg,ST[k].text)}</React.Fragment>
@@ -1036,9 +1043,9 @@ function App() {
 
                 return (
                   <div style={{display:'flex',flexDirection:'column',gap:18,flexShrink:0}}>
-                    <Table title="By Assignee" Icon={IcUsers} iconColor="#F59E0B" firstLabel="ASSIGNEE" rows={asgnRows}    withDot={false}/>
-                    <Table title="By Partner"  Icon={IcUsers} iconColor="#3B82F6" firstLabel="PARTNER"  rows={partnerRows} withDot={false}/>
-                    <Table title="By Category" Icon={IcTag}   iconColor="#8B5CF6" firstLabel="CATEGORY" rows={catRows}     withDot={true}/>
+                    <Table title="By Assignee" Icon={IcUsers} iconColor="#FF9500" firstLabel="ASSIGNEE" rows={asgnRows}    withDot={false}/>
+                    <Table title="By Partner"  Icon={IcUsers} iconColor="#007AFF" firstLabel="PARTNER"  rows={partnerRows} withDot={false}/>
+                    <Table title="By Category" Icon={IcTag}   iconColor="#AF52DE" firstLabel="CATEGORY" rows={catRows}     withDot={true}/>
                   </div>
                 );
               })()}
@@ -1049,14 +1056,14 @@ function App() {
             /* ── Settings ────────────────────────────────────────── */
             <div style={{maxWidth:900,display:'flex',flexDirection:'column',gap:20,overflowY:'auto'}}>
               <div style={{...card,padding:24}}>
-                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1E293B',marginBottom:20,fontSize:15}}>
-                  <IcTag size={18} style={{color:'#3B82F6'}}/>Category Management
+                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1C1C1E',marginBottom:20,fontSize:15}}>
+                  <IcTag size={18} style={{color:'#007AFF'}}/>Category Management
                 </div>
                 <div style={{display:'flex',gap:10,marginBottom:18}}>
                   <input value={nCat} onChange={e=>setNCat(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()}
                     placeholder="New category name..."
-                    style={{flex:1,border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 14px',fontSize:14}}/>
-                  <button onClick={addCat} style={{display:'flex',alignItems:'center',gap:6,background:'#3B82F6',color:'white',border:'none',borderRadius:10,padding:'11px 20px',fontSize:14,fontWeight:600,cursor:'pointer',boxShadow:'0 4px 12px -2px rgba(59,130,246,.4)'}}>
+                    style={{flex:1,border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15}}/>
+                  <button className="pbtn" onClick={addCat} style={{display:'flex',alignItems:'center',gap:6,background:'#007AFF',color:'white',border:'none',borderRadius:12,padding:'11px 22px',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 4px 12px -3px rgba(0,122,255,.5)'}}>
                     <IcPlus size={15}/>Add
                   </button>
                 </div>
@@ -1064,22 +1071,22 @@ function App() {
                   {cats.map(c=>{
                     const s=stats.find(x=>x.id===c.id)||{act:0,done:0};
                     return (
-                      <div key={c.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #F1F5F9',background:'#FAFBFC'}}>
+                      <div key={c.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #ECECEF',background:'#F7F7FA'}}>
                         <span style={{width:12,height:12,borderRadius:'50%',background:c.color,flexShrink:0}}/>
                         {eCat===c.id
                           ?<input defaultValue={c.name} autoFocus
                               onBlur={e=>updCat(c.id,e.target.value)}
                               onKeyDown={e=>{if(e.key==='Enter')updCat(c.id,e.target.value);if(e.key==='Escape')setECat(null);}}
-                              style={{flex:1,border:'1px solid #3B82F6',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
-                          :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#334155'}}>{c.name}</span>
+                              style={{flex:1,border:'1px solid #007AFF',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
+                          :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#3C3C43'}}>{c.name}</span>
                         }
-                        <div style={{display:'flex',gap:12,fontSize:12,color:'#94A3B8',flexShrink:0}}>
-                          <span style={{display:'flex',alignItems:'center',gap:4}}><span style={{width:7,height:7,borderRadius:'50%',background:'#3B82F6',display:'inline-block'}}/>{s.act} ongoing</span>
-                          <span style={{display:'flex',alignItems:'center',gap:4}}><span style={{width:7,height:7,borderRadius:'50%',background:'#10B981',display:'inline-block'}}/>{s.done} resolved</span>
+                        <div style={{display:'flex',gap:12,fontSize:12,color:'#8E8E93',flexShrink:0}}>
+                          <span style={{display:'flex',alignItems:'center',gap:4}}><span style={{width:7,height:7,borderRadius:'50%',background:'#007AFF',display:'inline-block'}}/>{s.act} ongoing</span>
+                          <span style={{display:'flex',alignItems:'center',gap:4}}><span style={{width:7,height:7,borderRadius:'50%',background:'#34C759',display:'inline-block'}}/>{s.done} resolved</span>
                         </div>
                         <div style={{display:'flex',gap:2,flexShrink:0}}>
-                          <button onClick={()=>setECat(c.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
-                          <button onClick={()=>delCat(c.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
+                          <button onClick={()=>setECat(c.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
+                          <button onClick={()=>delCat(c.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
                         </div>
                       </div>
                     );
@@ -1088,29 +1095,29 @@ function App() {
               </div>
               {/* Partner management */}
               <div style={{...card,padding:24}}>
-                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1E293B',marginBottom:20,fontSize:15}}>
-                  <IcUsers size={18} style={{color:'#8B5CF6'}}/>Partner Management
+                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1C1C1E',marginBottom:20,fontSize:15}}>
+                  <IcUsers size={18} style={{color:'#AF52DE'}}/>Partner Management
                 </div>
                 <div style={{display:'flex',gap:10,marginBottom:18}}>
                   <input value={nPart} onChange={e=>setNPart(e.target.value)}
                     onKeyDown={e=>e.key==='Enter'&&addPart()}
-                    placeholder="Partner name" style={{flex:1,border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 14px',fontSize:14,outline:'none'}}/>
-                  <button onClick={addPart} style={{padding:'11px 20px',borderRadius:10,background:'#8B5CF6',color:'white',border:'none',fontWeight:600,fontSize:14,cursor:'pointer',boxShadow:'0 4px 12px -2px rgba(139,92,246,.4)'}}>Add</button>
+                    placeholder="Partner name" style={{flex:1,border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15,outline:'none'}}/>
+                  <button className="pbtn" onClick={addPart} style={{padding:'11px 22px',borderRadius:12,background:'#AF52DE',color:'white',border:'none',fontWeight:600,fontSize:15,cursor:'pointer',boxShadow:'0 4px 12px -3px rgba(175,82,222,.5)'}}>Add</button>
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:8}}>
                   {partners.map(p=>(
-                    <div key={p.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #F1F5F9',background:'#FAFBFC'}}>
-                      <span style={{width:10,height:10,borderRadius:'50%',background:'#8B5CF6',flexShrink:0}}/>
+                    <div key={p.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #ECECEF',background:'#F7F7FA'}}>
+                      <span style={{width:10,height:10,borderRadius:'50%',background:'#AF52DE',flexShrink:0}}/>
                       {ePart===p.id
                         ?<input defaultValue={p.name} autoFocus
                             onBlur={e=>updPart(p.id,e.target.value)}
                             onKeyDown={e=>{if(e.key==='Enter')updPart(p.id,e.target.value);if(e.key==='Escape')setEPart(null);}}
-                            style={{flex:1,border:'1px solid #8B5CF6',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
-                        :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#334155'}}>{p.name}</span>
+                            style={{flex:1,border:'1px solid #AF52DE',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
+                        :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#3C3C43'}}>{p.name}</span>
                       }
                       <div style={{display:'flex',gap:2,flexShrink:0}}>
-                        <button onClick={()=>setEPart(p.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
-                        <button onClick={()=>delPart(p.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
+                        <button onClick={()=>setEPart(p.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
+                        <button onClick={()=>delPart(p.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
                       </div>
                     </div>
                   ))}
@@ -1118,29 +1125,29 @@ function App() {
               </div>
               {/* Assignee management */}
               <div style={{...card,padding:24}}>
-                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1E293B',marginBottom:20,fontSize:15}}>
-                  <IcUsers size={18} style={{color:'#F59E0B'}}/>Assignee Management
+                <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1C1C1E',marginBottom:20,fontSize:15}}>
+                  <IcUsers size={18} style={{color:'#FF9500'}}/>Assignee Management
                 </div>
                 <div style={{display:'flex',gap:10,marginBottom:18}}>
                   <input value={nAsgn} onChange={e=>setNAsgn(e.target.value)}
                     onKeyDown={e=>e.key==='Enter'&&addAsgn()}
-                    placeholder="Assignee name" style={{flex:1,border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 14px',fontSize:14,outline:'none'}}/>
-                  <button onClick={addAsgn} style={{padding:'11px 20px',borderRadius:10,background:'#F59E0B',color:'white',border:'none',fontWeight:600,fontSize:14,cursor:'pointer',boxShadow:'0 4px 12px -2px rgba(245,158,11,.4)'}}>Add</button>
+                    placeholder="Assignee name" style={{flex:1,border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15,outline:'none'}}/>
+                  <button className="pbtn" onClick={addAsgn} style={{padding:'11px 22px',borderRadius:12,background:'#FF9500',color:'white',border:'none',fontWeight:600,fontSize:15,cursor:'pointer',boxShadow:'0 4px 12px -3px rgba(255,149,0,.5)'}}>Add</button>
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:8}}>
                   {assignees.map(a=>(
-                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #F1F5F9',background:'#FAFBFC'}}>
-                      <span style={{width:10,height:10,borderRadius:'50%',background:'#F59E0B',flexShrink:0}}/>
+                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 14px',borderRadius:10,border:'1px solid #ECECEF',background:'#F7F7FA'}}>
+                      <span style={{width:10,height:10,borderRadius:'50%',background:'#FF9500',flexShrink:0}}/>
                       {eAsgn===a.id
                         ?<input defaultValue={a.name} autoFocus
                             onBlur={e=>updAsgn(a.id,e.target.value)}
                             onKeyDown={e=>{if(e.key==='Enter')updAsgn(a.id,e.target.value);if(e.key==='Escape')setEAsgn(null);}}
-                            style={{flex:1,border:'1px solid #F59E0B',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
-                        :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#334155'}}>{a.name}</span>
+                            style={{flex:1,border:'1px solid #FF9500',borderRadius:6,padding:'4px 8px',fontSize:13}}/>
+                        :<span style={{flex:1,fontWeight:600,fontSize:14,color:'#3C3C43'}}>{a.name}</span>
                       }
                       <div style={{display:'flex',gap:2,flexShrink:0}}>
-                        <button onClick={()=>setEAsgn(a.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
-                        <button onClick={()=>delAsgn(a.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#94A3B8',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
+                        <button onClick={()=>setEAsgn(a.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcEdit size={13}/></button>
+                        <button onClick={()=>delAsgn(a.id)} style={{padding:6,borderRadius:6,border:'none',background:'none',color:'#8E8E93',cursor:'pointer',display:'flex'}}><IcTrash size={13}/></button>
                       </div>
                     </div>
                   ))}
@@ -1148,34 +1155,34 @@ function App() {
               </div>
               {/* Resolved history */}
               <div style={{...card,padding:0,overflow:'hidden'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',borderBottom:'1px solid #F1F5F9'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1E293B',fontSize:15}}>
-                    <IcArchive size={18} style={{color:'#10B981'}}/>Resolved History
-                    <span style={{fontSize:12,fontWeight:500,color:'#94A3B8',background:'#F1F5F9',borderRadius:999,padding:'2px 8px'}}>{done.length}</span>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',borderBottom:'1px solid #ECECEF'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,color:'#1C1C1E',fontSize:15}}>
+                    <IcArchive size={18} style={{color:'#34C759'}}/>Resolved History
+                    <span style={{fontSize:12,fontWeight:500,color:'#8E8E93',background:'#ECECEF',borderRadius:999,padding:'2px 8px'}}>{done.length}</span>
                   </div>
                   <div style={{display:'flex',gap:8}}>
                     <select value={doneFA} onChange={e=>setDoneFA(e.target.value)}
-                      style={{fontSize:12,border:'1px solid #E2E8F0',borderRadius:8,padding:'5px 9px',background:'white',color:'#475569',cursor:'pointer'}}>
+                      style={{fontSize:12,border:'1px solid #E5E5EA',borderRadius:8,padding:'5px 9px',background:'white',color:'#48484A',cursor:'pointer'}}>
                       <option value="">All assignees</option>
                       {assignees.map(a=><option key={a.id}>{a.name}</option>)}
                     </select>
                     <select value={doneFP} onChange={e=>setDoneFP(e.target.value)}
-                      style={{fontSize:12,border:'1px solid #E2E8F0',borderRadius:8,padding:'5px 9px',background:'white',color:'#475569',cursor:'pointer'}}>
+                      style={{fontSize:12,border:'1px solid #E5E5EA',borderRadius:8,padding:'5px 9px',background:'white',color:'#48484A',cursor:'pointer'}}>
                       <option value="">All partners</option>
                       {partners.map(p=><option key={p.id}>{p.name}</option>)}
                     </select>
                   </div>
                 </div>
                 {/* Table header */}
-                <div style={{display:'grid',gridTemplateColumns:'1fr 140px 88px 1.3fr 84px 88px 88px 54px',gap:0,background:'#F8FAFC',borderBottom:'1px solid #F1F5F9',padding:'10px 16px'}}>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 140px 88px 1.3fr 84px 88px 88px 54px',gap:0,background:'#F5F5F7',borderBottom:'1px solid #ECECEF',padding:'10px 16px'}}>
                   {['Partner','Category','Store ID','Memo','Assignee','Start','Resolved','Days'].map(h=>(
-                    <span key={h} style={{fontSize:12,fontWeight:600,color:'#94A3B8'}}>{h}</span>
+                    <span key={h} style={{fontSize:12,fontWeight:600,color:'#8E8E93'}}>{h}</span>
                   ))}
                 </div>
                 {(()=>{
                   const filtered2=done.filter(p=>(!doneFA||p.assignee===doneFA)&&(!doneFP||p.partner===doneFP));
                   if(!filtered2.length) return (
-                    <div style={{textAlign:'center',padding:'32px 0',color:'#94A3B8',fontSize:13}}>No resolved projects</div>
+                    <div style={{textAlign:'center',padding:'32px 0',color:'#8E8E93',fontSize:13}}>No resolved projects</div>
                   );
                   return filtered2.map(p=>{
                     const cat=catBy(p.catId);
@@ -1185,44 +1192,44 @@ function App() {
                       <React.Fragment key={p.id}>
                         <div onClick={()=>setSelDone(isSel?null:p)}
                           style={{display:'grid',gridTemplateColumns:'1fr 140px 88px 1.3fr 84px 88px 88px 54px',gap:0,
-                            padding:'10px 16px',borderBottom:'1px solid #F8FAFC',cursor:'pointer',
-                            background:isSel?'#EFF6FF':'white',transition:'background .15s',alignItems:'center'}}>
-                          <span style={{fontSize:12,color:'#334155',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.partner}</span>
+                            padding:'10px 16px',borderBottom:'1px solid #F5F5F7',cursor:'pointer',
+                            background:isSel?'#E9F2FF':'white',transition:'background .15s',alignItems:'center'}}>
+                          <span style={{fontSize:12,color:'#3C3C43',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.partner}</span>
                           <span style={{minWidth:0,overflow:'hidden'}}>{cat?<span style={{fontSize:10,padding:'2px 7px',borderRadius:999,color:'white',background:cat.color,whiteSpace:'nowrap',maxWidth:'100%',overflow:'hidden',textOverflow:'ellipsis',display:'inline-block',verticalAlign:'middle'}}>{cat.name}</span>:'–'}</span>
-                          <span style={{fontSize:12,color:'#475569',fontWeight:600}}>{storeMain(p)}</span>
-                          <span style={{fontSize:12,color:'#94A3B8',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.memo||'–'}</span>
-                          <span style={{fontSize:12,color:'#334155'}}>{p.assignee}</span>
-                          <span style={{fontSize:11,color:'#94A3B8'}}>{p.start||'–'}</span>
-                          <span style={{fontSize:11,color:'#94A3B8'}}>{p.doneAt}</span>
-                          <span style={{fontSize:11,color:'#3B82F6',fontWeight:600}}>{days!=='–'?`${days}d`:'–'}</span>
+                          <span style={{fontSize:12,color:'#48484A',fontWeight:600}}>{storeMain(p)}</span>
+                          <span style={{fontSize:12,color:'#8E8E93',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.memo||'–'}</span>
+                          <span style={{fontSize:12,color:'#3C3C43'}}>{p.assignee}</span>
+                          <span style={{fontSize:11,color:'#8E8E93'}}>{p.start||'–'}</span>
+                          <span style={{fontSize:11,color:'#8E8E93'}}>{p.doneAt}</span>
+                          <span style={{fontSize:11,color:'#007AFF',fontWeight:600}}>{days!=='–'?`${days}d`:'–'}</span>
                         </div>
                         {isSel&&(
-                          <div style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0',display:'flex',flexDirection:'column',height:340}}>
+                          <div style={{background:'#F5F5F7',borderBottom:'1px solid #E5E5EA',display:'flex',flexDirection:'column',height:340}}>
                             {/* Chat header */}
-                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 16px',borderBottom:'1px solid #E2E8F0',flexShrink:0,background:'white'}}>
+                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 16px',borderBottom:'1px solid #E5E5EA',flexShrink:0,background:'white'}}>
                               <div style={{display:'flex',alignItems:'center',gap:10}}>
-                                <span style={{fontSize:13,fontWeight:700,color:'#1E293B'}}>{storeMain(p)}</span>
-                                <span style={{fontSize:11,color:'#94A3B8'}}>{p.partner} · {p.assignee}</span>
+                                <span style={{fontSize:13,fontWeight:700,color:'#1C1C1E'}}>{storeMain(p)}</span>
+                                <span style={{fontSize:11,color:'#8E8E93'}}>{p.partner} · {p.assignee}</span>
                                 {cat&&<span style={{fontSize:10,padding:'2px 7px',borderRadius:999,color:'white',background:cat.color}}>{cat.name}</span>}
                               </div>
                               <button onClick={e=>{e.stopPropagation();revertDone(p.id);}}
                                 style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:8,
-                                  border:'1px solid #F59E0B',background:'#FFFBEB',color:'#D97706',fontSize:12,fontWeight:600,cursor:'pointer'}}>
+                                  border:'1px solid #FF9500',background:'#FFF4E5',color:'#B25000',fontSize:12,fontWeight:600,cursor:'pointer'}}>
                                 <IcRefresh size={13}/>Reopen
                               </button>
                             </div>
                             {/* History list */}
                             <div ref={doneHistRef} style={{flex:1,overflowY:'auto',padding:'12px 16px',display:'flex',flexDirection:'column',gap:10}}>
                               {!(selDone.hist||[]).length
-                                ?<div style={{display:'flex',alignItems:'center',justifyContent:'center',flex:1,color:'#CBD5E1',fontSize:12}}>No history</div>
+                                ?<div style={{display:'flex',alignItems:'center',justifyContent:'center',flex:1,color:'#C7C7CC',fontSize:12}}>No history</div>
                                 :(selDone.hist||[]).map(h=>(
                                   <div key={h.id} style={{display:'flex',flexDirection:'column',alignItems:h.by==='Me'?'flex-end':'flex-start'}}>
-                                    <div style={{fontSize:10,color:'#94A3B8',marginBottom:3}}>{h.by} · {h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</div>
+                                    <div style={{fontSize:10,color:'#8E8E93',marginBottom:3}}>{h.by} · {h.deleted?`deleted · ${h.delAt||h.at}`:h.at}</div>
                                     {h.deleted
-                                      ? <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:10,background:'#F8FAFC',color:'#CBD5E1',fontSize:12,fontStyle:'italic',border:'1px dashed #E2E8F0'}}>Message deleted</div>
+                                      ? <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:10,background:'#F5F5F7',color:'#C7C7CC',fontSize:12,fontStyle:'italic',border:'1px dashed #E5E5EA'}}>Message deleted</div>
                                       : <div style={{maxWidth:'75%',padding:'8px 12px',borderRadius:h.by==='Me'?'12px 4px 12px 12px':'4px 12px 12px 12px',
-                                          background:h.by==='Me'?'#3B82F6':'white',color:h.by==='Me'?'white':'#334155',
-                                          fontSize:12,lineHeight:1.5,boxShadow:'0 1px 3px rgba(0,0,0,.08)',border:h.by==='Me'?'none':'1px solid #E2E8F0'}}>
+                                          background:h.by==='Me'?'#007AFF':'white',color:h.by==='Me'?'white':'#3C3C43',
+                                          fontSize:12,lineHeight:1.5,boxShadow:'0 1px 3px rgba(0,0,0,.08)',border:h.by==='Me'?'none':'1px solid #E5E5EA'}}>
                                           {h.text}
                                         </div>}
                                   </div>
@@ -1230,12 +1237,12 @@ function App() {
                               }
                             </div>
                             {/* Message input */}
-                            <div onClick={e=>e.stopPropagation()} style={{display:'flex',gap:8,padding:'10px 16px',borderTop:'1px solid #E2E8F0',background:'white',flexShrink:0}}>
+                            <div onClick={e=>e.stopPropagation()} style={{display:'flex',gap:8,padding:'10px 16px',borderTop:'1px solid #E5E5EA',background:'white',flexShrink:0}}>
                               <input value={doneMsg} onChange={e=>setDoneMsg(e.target.value)}
                                 onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&addDoneHist()}
-                                placeholder="Add note..." style={{flex:1,border:'1px solid #E2E8F0',borderRadius:8,padding:'7px 11px',fontSize:12,outline:'none'}}/>
+                                placeholder="Add note..." style={{flex:1,border:'1px solid #E5E5EA',borderRadius:8,padding:'7px 11px',fontSize:12,outline:'none'}}/>
                               <button onClick={addDoneHist}
-                                style={{padding:'7px 14px',borderRadius:8,background:'#3B82F6',color:'white',border:'none',fontSize:12,fontWeight:600,cursor:'pointer'}}>Send</button>
+                                style={{padding:'7px 14px',borderRadius:8,background:'#007AFF',color:'white',border:'none',fontSize:12,fontWeight:600,cursor:'pointer'}}>Send</button>
                             </div>
                           </div>
                         )}
@@ -1251,19 +1258,19 @@ function App() {
 
       {/* ── Registration modal ────────────────────────────────────────────── */}
       {modal&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9998,padding:16}}>
-          <div style={{background:'white',borderRadius:20,boxShadow:'0 24px 64px rgba(0,0,0,.2)',width:'100%',maxWidth:460,maxHeight:'90vh',display:'flex',flexDirection:'column'}}>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'18px 24px',borderBottom:'1px solid #F1F5F9',flexShrink:0}}>
-              <span style={{fontSize:18,fontWeight:700,color:'#0F172A'}}>New Request</span>
-              <button onClick={()=>setModal(false)} style={{padding:6,borderRadius:8,border:'none',background:'none',cursor:'pointer',color:'#94A3B8',display:'flex'}}><IcX size={18}/></button>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.32)',backdropFilter:'blur(6px)',WebkitBackdropFilter:'blur(6px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9998,padding:16,animation:'fadeIn .2s ease'}}>
+          <div style={{background:'rgba(255,255,255,.96)',borderRadius:26,boxShadow:'0 30px 80px -12px rgba(0,0,0,.35)',width:'100%',maxWidth:460,maxHeight:'90vh',display:'flex',flexDirection:'column',animation:'sheetIn .28s cubic-bezier(.4,0,.2,1)',overflow:'hidden'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'18px 22px',borderBottom:'1px solid rgba(0,0,0,.06)',flexShrink:0}}>
+              <span style={{fontSize:19,fontWeight:700,color:'#1C1C1E',letterSpacing:-.4}}>New Request</span>
+              <button className="nbtn" onClick={()=>setModal(false)} style={{padding:7,borderRadius:'50%',border:'none',background:'rgba(120,120,128,.12)',cursor:'pointer',color:'#8E8E93',display:'flex'}}><IcX size={17}/></button>
             </div>
             <div style={{padding:'20px 24px',display:'flex',flexDirection:'column',gap:14,overflowY:'auto'}}>
 
               {/* Assignee */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Assignee <span style={{color:'#EF4444'}}>*</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Assignee <span style={{color:'#FF3B30'}}>*</span></label>
                 <select value={form.assignee} onChange={e=>setForm(v=>({...v,assignee:e.target.value}))}
-                  style={{width:'100%',border:`1px solid ${!form.assignee?'#FCA5A5':'#E2E8F0'}`,borderRadius:10,padding:'11px 13px',fontSize:14,background:'white'}}>
+                  style={{width:'100%',border:`1px solid ${!form.assignee?'#FF9F99':'#E5E5EA'}`,borderRadius:12,padding:'12px 14px',fontSize:15,background:'white'}}>
                   <option value="">Select</option>
                   {assignees.map(a=><option key={a.id} value={a.name}>{a.name}</option>)}
                 </select>
@@ -1271,16 +1278,16 @@ function App() {
 
               {/* Start date */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Start date <span style={{color:'#EF4444'}}>*</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Start date <span style={{color:'#FF3B30'}}>*</span></label>
                 <input type="date" value={form.start} onChange={e=>setForm(v=>({...v,start:e.target.value}))}
-                  style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 13px',fontSize:14}}/>
+                  style={{width:'100%',border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15}}/>
               </div>
 
               {/* Partner */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Partner <span style={{color:'#EF4444'}}>*</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Partner <span style={{color:'#FF3B30'}}>*</span></label>
                 <select value={form.partner} onChange={e=>setForm(v=>({...v,partner:e.target.value}))}
-                  style={{width:'100%',border:`1px solid ${!form.partner?'#FCA5A5':'#E2E8F0'}`,borderRadius:10,padding:'11px 13px',fontSize:14,background:'white'}}>
+                  style={{width:'100%',border:`1px solid ${!form.partner?'#FF9F99':'#E5E5EA'}`,borderRadius:12,padding:'12px 14px',fontSize:15,background:'white'}}>
                   <option value="">Select</option>
                   {partners.map(p=><option key={p.id} value={p.name}>{p.name}</option>)}
                 </select>
@@ -1288,39 +1295,39 @@ function App() {
 
               {/* Category */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Category <span style={{color:'#EF4444'}}>*</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Category <span style={{color:'#FF3B30'}}>*</span></label>
                 <select value={form.catId} onChange={e=>setForm(v=>({...v,catId:Number(e.target.value)}))}
-                  style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 13px',fontSize:14,background:'white'}}>
+                  style={{width:'100%',border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15,background:'white'}}>
                   {cats.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
 
               {/* Store ID */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Store ID <span style={{color:'#94A3B8',fontWeight:400}}>(optional · separate multiple with commas)</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Store ID <span style={{color:'#8E8E93',fontWeight:400}}>(optional · separate multiple with commas)</span></label>
                 <textarea value={form.storeId} onChange={e=>setForm(v=>({...v,storeId:e.target.value}))}
                   placeholder="e.g. 44556, 3421, 33456, 11235" rows={2}
-                  style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 13px',fontSize:14,resize:'vertical',fontFamily:'inherit'}}/>
-                {(()=>{const n=form.storeId.split(',').map(s=>s.trim()).filter(Boolean).length;return n>1?<div style={{marginTop:6,fontSize:11,color:'#3B82F6',fontWeight:600}}>{n} stores entered · registered as 1 project</div>:null;})()}
+                  style={{width:'100%',border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15,resize:'vertical',fontFamily:'inherit'}}/>
+                {(()=>{const n=form.storeId.split(',').map(s=>s.trim()).filter(Boolean).length;return n>1?<div style={{marginTop:6,fontSize:11,color:'#007AFF',fontWeight:600}}>{n} stores entered · registered as 1 project</div>:null;})()}
               </div>
 
               {/* Memo */}
               <div>
-                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#475569',marginBottom:7,letterSpacing:.3}}>Memo <span style={{color:'#94A3B8',fontWeight:400}}>(optional)</span></label>
+                <label style={{display:'block',fontSize:12,fontWeight:700,color:'#48484A',marginBottom:7,letterSpacing:.3}}>Memo <span style={{color:'#8E8E93',fontWeight:400}}>(optional)</span></label>
                 <textarea value={form.memo} onChange={e=>setForm(v=>({...v,memo:e.target.value}))}
                   placeholder="Enter a memo" rows={2}
-                  style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:10,padding:'11px 13px',fontSize:14,resize:'vertical',fontFamily:'inherit'}}/>
+                  style={{width:'100%',border:'1px solid #E5E5EA',borderRadius:12,padding:'12px 14px',fontSize:15,resize:'vertical',fontFamily:'inherit'}}/>
               </div>
 
             </div>
-            <div style={{padding:'0 24px 24px',display:'flex',gap:12,flexShrink:0}}>
-              <button onClick={()=>setModal(false)} style={{flex:1,padding:'13px 0',border:'1px solid #E2E8F0',borderRadius:12,fontSize:14,fontWeight:600,color:'#64748B',background:'white',cursor:'pointer'}}>Cancel</button>
+            <div style={{padding:'4px 22px 22px',display:'flex',gap:10,flexShrink:0}}>
+              <button className="pbtn" onClick={()=>setModal(false)} style={{flex:1,padding:'13px 0',border:'none',borderRadius:14,fontSize:15,fontWeight:600,color:'#007AFF',background:'rgba(120,120,128,.12)',cursor:'pointer'}}>Cancel</button>
               {(()=>{const ok=form.partner&&form.assignee&&form.start;return(
-                <button onClick={addProj} disabled={!ok} style={{
-                  flex:1,padding:'13px 0',border:'none',borderRadius:12,fontSize:14,fontWeight:700,color:'white',
+                <button className="pbtn" onClick={addProj} disabled={!ok} style={{
+                  flex:1,padding:'13px 0',border:'none',borderRadius:14,fontSize:15,fontWeight:600,color:'white',
                   cursor:ok?'pointer':'not-allowed',
-                  background:ok?'#3B82F6':'#93C5FD',
-                  boxShadow:ok?'0 4px 14px -2px rgba(59,130,246,.45)':'none'
+                  background:ok?'#007AFF':'#66B0FF',
+                  boxShadow:ok?'0 4px 14px -3px rgba(0,122,255,.5)':'none'
                 }}>Register</button>
               );})()}
             </div>
