@@ -1,0 +1,12 @@
+# Netlify configuration for Partnership AM (static single-file app)
+# No build step — index.html is served directly from the repo root.
+
+[build]
+  publish = "."
+  command = ""
+
+# Single-page app: always serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
