@@ -1,5 +1,7 @@
 # Local tooling / preview config
-.claude/
+.claude/*
+# but track shared project skills
+!.claude/skills/
 
 # Backup snapshots
 index.backup.html
